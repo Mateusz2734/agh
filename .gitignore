@@ -1,1 +1,6 @@
+# Jupyter Notebook
 .ipynb_checkpoints/
+
+# CLion and CMake
+.idea/
+cmake*
