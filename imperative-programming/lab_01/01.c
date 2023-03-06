@@ -9,18 +9,38 @@
 // for n = 0 return empty array
 // for n = 1 return one-element array, with array[0] = start
 void linspace(double array[], double start, double stop, int n) {
+	if (n == 1) {
+		array[0] = start;
+	}
+	else {
+		double delta = (stop - start) / (n - 1);
+		for (int i = 0; i < n; i++) {
+			array[i] = start + i*delta;
+		}
+	}
 }
 
 // Multiply each element of v by the value of scalar
 void multiply_by_scalar(double v[], int n, double scalar) {
+	for (int i = 0; i < n; i++) {
+		v[i] *= scalar;
+	}
 }
 
 // Add to each element v1[i] value of v2[i]
 void add(double v1[], const double v2[], int n) {
+	for (int i = 0; i < n; i++) {
+		v1[i] += v2[i];
+	}
 }
 
 // Calculate and return the dot product of v1 and v2
 double dot_product(const double v1[], const double v2[], int n) {
+	double product = 0;
+	for (int i = 0; i < n; i++) {
+		product += (v1[i] * v2[i]);
+	}
+	return product;
 }
 
 // Generates the sequence of n samples by incrementing the start value
@@ -29,6 +49,14 @@ double dot_product(const double v1[], const double v2[], int n) {
 // for n = 0 return empty array
 // for n = 1 return one-element array, with array[0] = start
 void range(double array[], double start, double step, int n) {
+	if (n == 1) {
+		array[0] = start;
+	}
+	else {
+		for (int i = 0; i < n; i++) {
+			array[i] = start + i * step;
+		}
+	}
 }
 
 // read double vector of size n
@@ -54,7 +82,7 @@ int main(void) {
     if (TEST) printf("Wpisz numer testu [1, 5]: ");
 	scanf("%d", &to_do);
 
-	switch (to_d 
+	switch (to_do) {		
 		case 1: // linspace
 		    if (TEST) printf("LINSPACE: Wpisz liczby: n, start, stop ");
 			scanf("%d %lf %lf", &len, &start, &stop);
