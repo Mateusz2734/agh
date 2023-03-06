@@ -4,3 +4,6 @@
 # CLion and CMake
 .idea/
 cmake*
+
+# Executables
+*.exe
