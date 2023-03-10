@@ -1,3 +1,10 @@
+// Liczba doskonała jest to taka liczba naturalna, która jest
+// sumą wszystkich swych dzielników właściwych (to znaczy 
+// od niej mniejszych). Najmniejszą liczbą doskonałą jest 6, 
+// ponieważ jej dzielnikami właściwymi są 1, 2, 3 i 1 + 2 + 3 = 6. 
+// Napisz program, który znajduje wszystkie liczby doskonałe
+// w zadanym przedziale oraz ich liczbę.
+
 #include <stdio.h>
 
 int sumOfDivisors(int n) {

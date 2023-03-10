@@ -1,3 +1,7 @@
+// Dana jest liczba całkowita dodatnia n. 
+// Napisz program, który znajduje wszystkie liczby pierwsze 
+// mniejsze od n, których cyfry tworzą ciąg niemalejący.
+
 #include <stdio.h>
 #include <stdbool.h>
 
