@@ -1,3 +1,7 @@
+# Algorytm dla każdego indeksu zakłada, że jest on środkiem 
+# palindromu o nieparzystej długości oraz dla kolejnych wartości k
+# sprawdza, czy znaki na indeksach w odległości k od środka są równe
+# Złożoność wynosi O(n^2)
 from zad1testy import runtests
 
 def ceasar(s):
