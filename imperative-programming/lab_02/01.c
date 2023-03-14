@@ -4,19 +4,46 @@
 
 #define N 100
 
+// TODO 1: remove
+void print_arr(int arr[], int n) {
+	for (int i = 0; i < n; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
 // Returns an integer from [a,b] using library function rand() and operator %
 // if a > b return INT_MIN
 // if b - a > RAND_MAX return INT_MAX
 // if a == b return a
 // else return integer from [a,b]
 int rand_from_interval(int a, int b) {
+	if (a > b) {
+		return INT_MIN;
+	} else if (b - a > RAND_MAX) {
+		return INT_MAX;
+	} else if (a == b) {
+		return a;
+	} else {
+		return rand()%(b + 1 - a) + a;
+	}
 }
 
 void swap (int array[], int i, int k) {
+	int tmp = array[i];
+	array[i] = array[k];
+	array[k] = tmp;
 }
 
 // random permutation of integers from [0, n-1]
 void rand_permutation(int n, int array[]) {
+	for (int i = 0; i < n; i++) {
+		array[i] = i;
+	}	
+	for (int i = 0; i < n - 1; i++) {
+		int k = rand_from_interval(i, n-1);
+		swap(array, i, k);
+	}
 }
 
 // bubble sort (increasing order)
