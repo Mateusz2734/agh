@@ -8,12 +8,28 @@ int stack[STACK_SIZE];
 int top = 0;
 
 int stack_push(int x) {
+	if (top == STACK_SIZE) {
+		return OVERFLOW;
+	} else {
+		stack[top] = x;
+		top++;
+		return OK;
+	}
 }
 
 int stack_pop(void) {
+	if (top == 0) {
+		return UNDERFLOW;
+	} else {
+		int x = stack[top - 1];
+		stack[top - 1] = 0;
+		top--;
+		return x;
+	}
 }
 
 int stack_state(void) {
+	return top;
 }
 
 // FIFO queue with shifts
