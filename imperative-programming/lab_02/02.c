@@ -39,16 +39,56 @@ int stack_state(void) {
 int queue[QUEUE_SIZE];
 int in = 0, curr_nr = 0;
 
+void print_arr(int arr[], int n) {
+	for (int i = 0; i < n; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
 int queue_push(int in_nr) { // in_nr clients try to enter the queue
+	for (int i = 1; i <= in_nr; i++) {
+		if (in + 1 <= QUEUE_SIZE) {
+			queue[in] = curr_nr + 1;
+			curr_nr++;
+			in++;
+		} else {
+			curr_nr += in_nr - i + 1;
+			return OVERFLOW;
+		}	
+	}
+	return OK;
+}
+
+void shift_left(int arr[], int size) {
+	for (int i = 1; i < size; i++) {
+        arr[i-1] = arr[i];
+    }
+	arr[size-1] = 0;
 }
 
 int queue_pop(int out_nr) {
+	for (int i = 0; i < out_nr; i++) {
+		if (in - 1 >= 0) {
+			shift_left(queue, QUEUE_SIZE);
+			in--;
+		} else {
+			return UNDERFLOW;
+		}
+	}
+	return in;
 }
 
 int queue_state(void) {
+	return in;
 }
 
 void queue_print(void) {
+	for (int i = 0; i < QUEUE_SIZE; i++) {
+		if (queue[i] != 0) {
+			printf("%d ", queue[i]);
+		}
+	}
 }
 
 // Queue with cyclic buffer
@@ -69,6 +109,11 @@ int cbuff_state(void) {
 }
 
 void cbuff_print(void) {
+	for (int i = 0; i < CBUFF_SIZE; i++) {
+		if (cbuff[out + i] != 0) {
+			printf("%d ", cbuff[out + i]);
+		}
+	}
 }
 
 int main(void) {

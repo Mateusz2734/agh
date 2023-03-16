@@ -29,15 +29,9 @@ int bubble_sort(int n, int T[]) {
     }
 }
 
-int main(void) {
-    int arr1[8] = {0, 1, 2, 3, 7, 4, 5, 6};
-    int arr2[8] = {1, 2, 3, 7, 4, 5, 6, 0};
-    int arr3[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-    
-    int a = bubble_sort(8, arr1);
-    print_arr(arr1, 8);
-    int b = bubble_sort(8, arr2);
-    int c = bubble_sort(8, arr3);
-    printf("%d %d %d", a, b, c);
-    return 0;
+void shift_left(int arr[], int size) {
+	for (int i = 1; i < size; i++) {
+        arr[i-1] = arr[i];
+    }
+    arr[size-1] = 0;
 }
