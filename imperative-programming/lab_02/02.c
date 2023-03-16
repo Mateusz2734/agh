@@ -100,17 +100,20 @@ int out = 0, len = 0;
 
 
 int cbuff_push(int cli_nr) {
+
 }
 
 int cbuff_pop(void) {
+	
 }
 
 int cbuff_state(void) {
+	return len;
 }
 
 void cbuff_print(void) {
 	for (int i = 0; i < CBUFF_SIZE; i++) {
-		if (cbuff[out + i] != 0) {
+		if (cbuff[(out + i) % 10] != 0) {
 			printf("%d ", cbuff[out + i]);
 		}
 	}
