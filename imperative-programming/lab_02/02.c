@@ -100,10 +100,26 @@ int out = 0, len = 0;
 
 
 int cbuff_push(int cli_nr) {
-
+	int id = (out + len) % CBUFF_SIZE;
+	if ( cbuff[id] == 0) {
+		cbuff[id] = cli_nr;
+		len++;
+		return OK;
+	} else {
+		return OVERFLOW;
+	}
 }
 
 int cbuff_pop(void) {
+	if (len != 0) {
+		int p = cbuff[out];
+		cbuff[out] = 0;
+		out = (out + 1) % CBUFF_SIZE;
+		len--;
+		return p;
+	} else {
+		return UNDERFLOW;
+	}
 	
 }
 
@@ -113,8 +129,8 @@ int cbuff_state(void) {
 
 void cbuff_print(void) {
 	for (int i = 0; i < CBUFF_SIZE; i++) {
-		if (cbuff[(out + i) % 10] != 0) {
-			printf("%d ", cbuff[out + i]);
+		if (cbuff[(out + i) % CBUFF_SIZE] != 0) {
+			printf("%d ", cbuff[(out + i) % CBUFF_SIZE]);
 		}
 	}
 }
