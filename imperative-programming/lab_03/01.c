@@ -23,7 +23,15 @@ void mean_variance(const int v[], int n, double *mean, double *variance) {
 }
 
 // Fill n-element array v[] with Bernoulli sample (binary values)
-void bernoulli_gen(int v[], int n, double probability) {
+void bernoulli_gen(int v[], int n, double p) {
+	for (int i = 0; i < n; i++) {
+		long x = rand();
+		if (x < p*(RAND_MAX)) {
+			v[i] = 1;
+		} else {
+			v[i] = 0;
+		}
+	}
 }
 
 // Calculate pmf (probability mass function) of discrete random variable.
