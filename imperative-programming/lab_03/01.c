@@ -5,6 +5,19 @@
 
 #define TWO_DICE_SUM 11
 
+// Returns an integer from [a,b] using library function rand() and operator %
+int rand_from_interval(int a, int b) {
+	if (a > b) {
+		return INT_MIN;
+	} else if (b - a > RAND_MAX) {
+		return INT_MAX;
+	} else if (a == b) {
+		return a;
+	} else {
+		return rand()%(b + 1 - a) + a;
+	}
+}
+
 // Calculates arithmetic mean and variance of numbers from n-element array v[]
 // for n = 0: mean = variance = 0
 void mean_variance(const int v[], int n, double *mean, double *variance) {
@@ -39,6 +52,37 @@ void bernoulli_gen(int v[], int n, double p) {
 // numbers shown (the result is from [2, 12]).
 // trials - number of trials
 void pmf(double v[], int trials) {
+	// Init values of array to 0
+	for (int i = 0; i < TWO_DICE_SUM; i++) {
+		v[i] = 0;
+	}
+
+	// Accumulate the results
+	for (int i = 0; i < trials; i++) {
+		int A = rand_from_interval(1,6);
+		int B = rand_from_interval(1,6);
+		int sum = A + B;
+		v[sum-2] += 1;
+	}
+
+	// Divide by # of trials to get pmf
+	for (int i = 0; i < TWO_DICE_SUM; i++) {
+		v[i] /= trials;
+	}
+}
+
+// Histogram - bar chart for the values from v[] array of length n
+// x_start - the first value on the abscissa (x increment is 1),
+// y_scale - y value corresponding to single char of the histogram
+void print_histogram(const double v[], int n, int x_start, double y_scale, char mark) {
+    for (int i = 0; i < n; i++) {
+        printf("%2d  |", i + x_start);
+        int x = round(v[i]/y_scale);
+        for (int j = 0; j < x; j++) {
+            printf("%c", mark);
+        }
+        printf(" %.3f\n", v[i]);
+    }
 }
 
 // Calculates the cumulative distribution function (v) for 'trials' numbers
@@ -46,23 +90,28 @@ void pmf(double v[], int trials) {
 // numbers shown (the result is from [2, 12]).
 // trials - number of trials
 void cdf(double v[], int trials) {
-}
-
-// Histogram - bar chart for the values from v[] array of length n
-// x_start - the first value on the abscissa (x increment is 1),
-// y_scale - y value corresponding to single char of the histogram
-void print_histogram(const double v[], int n, int x_start, double y_scale, char mark) {
+	pmf(v, trials);
+	for (int i = 1; i < TWO_DICE_SUM; i++) {
+		v[i] = v[i] + v[i-1];
+	}
 }
 
 // Simulate Monty-Hall problem
 // input: n - number of trials
 // output: wins - number od wins if door switched
 // output: win_probability - probability of win if door switched
-
 // This function calls rand() exactly 2 times:
 // the first one returns winning door number,
 // the second one returns door number that the player has chosen the first time,
 void monty_hall(int n, int *p_switch_wins) {
+	*p_switch_wins = 0;
+	for (int i = 0; i < n; i++) {
+		int winner = rand_from_interval(1,3);
+		int chosen = rand_from_interval(1,3);
+		if (winner != chosen) {
+			(*p_switch_wins)++;
+		}
+	}
 }
 
 // print double vector of size n (with 2 figures after the decimal point)
@@ -71,18 +120,6 @@ void print_vector(const double v[], int n) {
 		printf("%.2f ", v[i]);
 	}
 	printf("\n");
-}
-
-int rand_from_interval(int a, int b) {
-	if (a > b) {
-		return INT_MIN;
-	} else if (b - a > RAND_MAX) {
-		return INT_MAX;
-	} else if (a == b) {
-		return a;
-	} else {
-		return rand()%(b + 1 - a) + a;
-	}
 }
 
 void fill_with_randoms(int i_vector[], int n, int a, int b) {
