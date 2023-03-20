@@ -1,11 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <math.h>
+
 #define TWO_DICE_SUM 11
 
 // Calculates arithmetic mean and variance of numbers from n-element array v[]
 // for n = 0: mean = variance = 0
 void mean_variance(const int v[], int n, double *mean, double *variance) {
+	double sum = 0;
+	if (n == 0) {
+		*mean = 0;
+		*variance = 0;
+	} else {
+		for (int i = 0; i < n; i++) {
+			*mean += v[i];
+            sum += pow(v[i], 2);
+		}
+		*mean /= n;
+        *variance = (sum/n) - pow((*mean), 2);
+	}
 }
 
 // Fill n-element array v[] with Bernoulli sample (binary values)
@@ -44,12 +58,30 @@ void monty_hall(int n, int *p_switch_wins) {
 }
 
 // print double vector of size n (with 2 figures after the decimal point)
-//void print_vector(const double v[], int n) {
-//	for (int i = 0; i < n; ++i) {
-//		printf("%.2f ", v[i]);
-//	}
-//	printf("\n");
-//}
+void print_vector(const double v[], int n) {
+	for (int i = 0; i < n; ++i) {
+		printf("%.2f ", v[i]);
+	}
+	printf("\n");
+}
+
+int rand_from_interval(int a, int b) {
+	if (a > b) {
+		return INT_MIN;
+	} else if (b - a > RAND_MAX) {
+		return INT_MAX;
+	} else if (a == b) {
+		return a;
+	} else {
+		return rand()%(b + 1 - a) + a;
+	}
+}
+
+void fill_with_randoms(int i_vector[], int n, int a, int b) {
+	for (int i = 0 ; i < n; i++) {
+		i_vector[i] = rand_from_interval(a, b);
+	}
+}
 
 // print integer vector
 void print_int_vector(const int v[], int n) {
