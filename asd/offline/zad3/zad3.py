@@ -1,29 +1,20 @@
 # Mateusz Wala
 # Zamysl algorytmu: iterujemy po kazdym elemencie wejściowej tablicy i sprawdzamy czy jest palindromem. 
 # Jesli nie jest, to dodajemy do tablicy T2 jego odwrocona wersje. Nastepnie laczymy tablice T i T2 i sortujemy je 
-# algorytmem quicksort z wyborem mediany z 3 liczb: lewej granicy, prawej granicy i losowej liczby z przedzialu.
-# Na koncu znajdujemy dlugosc najdluzszego podciagu o wyrazach stalych, czyli sile najsilniejszego slowa
+# algorytmem quicksort z partition z pivotem jako losowa liczba z przedzialu oraz użyciem prostszego i szybszego sortowania dla list o rozmiarach < 10.
+# Na koncu znajdujemy dlugosc najdluzszego podciagu o wyrazach stalych, czyli sile najsilniejszego slowa.
 # Szacowana zlozonosc: O(N + 2n*log(2n)) czyli O(N + n*log(n))
 import random
 from zad3testy import runtests 
 
-def med(a, b, c):
-    if (b < a and a < c) or (c < a and a < b):
-        return a
-    if (a < b and b < c) or (c < b and b < a):
-        return b
-    else:
-        return c
-
-# Partition z wyborem mediany z 3 liczb: lewej granicy, prawej granicy i losowej liczby z przedzialu
-def partition(T, l, r):
-    pivot = med(l, random.randint(l, r), r)
-    T[l], T[pivot] = T[pivot], T[l]
-    i = l - 1
+# Partition z użyciem losowej liczby z przedzialu
+def partition(T, p, r):
+    y = random.randrange(p, r)
+    T[y], T[r] = T[r], T[y]
     x = T[r]
-
-    for j in range(l, r):
-        if T[j] < x:
+    i = p - 1
+    for j in range(p, r):
+        if T[j] <= x:
             i += 1
             T[i], T[j] = T[j], T[i]
     T[i + 1], T[r] = T[r], T[i + 1]
@@ -31,9 +22,19 @@ def partition(T, l, r):
 
 def quicksort(T, l, r):
     if l < r:
-        pivot = partition(T, l, r)
-        quicksort(T, l, pivot - 1)
-        quicksort(T, pivot + 1, r)
+        if r - l < 10:
+            bubblesort(T, l, r)
+        else:
+            pivot = partition(T, l, r)
+            quicksort(T, l, pivot - 1)
+            quicksort(T, pivot + 1, r)
+    return T
+
+def bubblesort(T, l, r):
+    for _ in range(l, r):
+        for j in range(l, r):
+            if T[j] > T[j+1]:
+                T[j], T[j+1] = T[j+1], T[j]
     return T
 
 # Funkcja znajduje dlugosc najdluzszego podciagu o wyrazach stalych
