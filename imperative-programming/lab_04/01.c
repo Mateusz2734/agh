@@ -7,6 +7,7 @@
 #define LAST_CHAR 127
 #define MAX_CHARS (LAST_CHAR - FIRST_CHAR)
 #define MAX_BIGRAMS ((LAST_CHAR - FIRST_CHAR) * (LAST_CHAR - FIRST_CHAR))
+#define MAX_LINE 128
 
 #define NEWLINE '\n'
 #define IN_WORD 1
@@ -14,7 +15,24 @@
 #define IN_LINE_COMMENT 1
 #define IN_BLOCK_COMMENT 2
 
+typedef struct {
+	char c;
+	int count;
+} charCount;
+
 int count[MAX_BIGRAMS] = { 0 };
+
+int read_int();
+void print_cc_vector(charCount v[], int n);
+void swap_cc(charCount *a, charCount *b);
+void bubblesort_cc(charCount v[], int n);
+
+void print_vector(int v[], int n) {
+	for (int i = 0; i < n; ++i) {
+		printf("%d ", v[i]);
+	}
+	printf("\n");
+}
 
 // sort indices according to their respective counts.
 // sort alphabetically if counts equal
@@ -38,23 +56,56 @@ int cmp_di (const void *a, const void *b) {
 
 // count lines, words & chars in a given text file
 void wc(int *nl, int *nw, int *nc) {
+	/* It doesn't work at the moment*/
+	*nl = *nw = *nc = 0;
+	char buffer[MAX_LINE];
+	int j = 0;
+	while (fgets(buffer, MAX_LINE, stdin) != NULL) {
+		for (int i = 0; i < MAX_LINE; i++) {
+			if ((!isspace(buffer[i]) && isspace(buffer[i - 1])) || (buffer[i] == '\0' && !isspace(buffer[i - 1]))) {
+				(*nw)++;
+			}
+			(*nc)++;
+			if (buffer[i] == '\0') {
+				(*nl)++;
+				break;
+			}
+    	}
+	}
+	(*nc)--; // to avoid counting the null char
 }
 
 void char_count(int char_no, int *n_char, int *cnt) {
+	char buffer[MAX_LINE];
+	charCount counter[LAST_CHAR];
+	
+	// Initialize the counter array
+	for (int i = 0; i < LAST_CHAR; i++) {
+		counter[i].c = (char)(i);
+		counter[i].count = 0;
+	}
+
+	// read the input and count the chars
+	while (fgets(buffer, MAX_LINE, stdin) != NULL) {
+		for (int i = 0; i < MAX_LINE; i++) {
+			if (buffer[i] == '\0' || buffer[i] == NEWLINE || buffer[i] == '\r') {
+				break;
+			} else if ((int)buffer[i] >= FIRST_CHAR && (int)buffer[i] < LAST_CHAR) {
+				counter[(int)buffer[i]].count++;
+			}
+		}
+	}
+
+	// sort the counter array and get the char_no-th char
+	bubblesort_cc(counter, LAST_CHAR);
+	*n_char = counter[char_no-1].c;
+	*cnt = (int)counter[char_no-1].count;
 }
 
 void bigram_count(int bigram_no, int bigram[]) {
 }
 
 void find_comments(int *line_comment_counter, int *block_comment_counter) {
-}
-
-#define MAX_LINE 128
-
-int read_int() {
-	char line[MAX_LINE];
-	fgets(line, MAX_LINE, stdin); // to get the whole line
-	return (int)strtol(line, NULL, 10);
 }
 
 int main(void) {
@@ -90,3 +141,32 @@ int main(void) {
 	return 0;
 }
 
+void print_cc_vector(charCount v[], int n) {
+	for (int i = 0; i < n; ++i) {
+		printf("char %c cnt %d ", v[i].c, v[i].count);
+	}
+	printf("\n");
+}
+
+void swap_cc(charCount *a, charCount *b) {
+	charCount temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+void bubblesort_cc(charCount v[], int n) {
+	int i, j, temp;
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < n - i - 1; j++) {
+			if (v[j].count < v[j + 1].count) {
+				swap_cc(&v[j], &v[j + 1]);
+			}
+		}
+	}
+}
+
+int read_int() {
+	char line[MAX_LINE];
+	fgets(line, MAX_LINE, stdin); // to get the whole line
+	return (int)strtol(line, NULL, 10);
+}
