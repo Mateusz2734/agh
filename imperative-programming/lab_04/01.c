@@ -77,7 +77,7 @@ void wc(int *nl, int *nw, int *nc) {
                 nw++;
             }
         }
-        if (asciiChar == 0x0a) {
+        if (asciiChar == 0x0a || asciiChar == NEWLINE) {
             nl++;
         };
         if (asciiChar == -1) {
@@ -155,6 +155,50 @@ void bigram_count(int bigram_no, int bigram[]) {
 }
 
 void find_comments(int *line_comment_counter, int *block_comment_counter) {
+    int blockCnt = 0, lineCnt = 0;
+    int ongoingBlock = 0, ongoingLine = 0;
+    int prevChar = 0;
+    int separation = 0;
+    while(!feof(stdin)) {
+        int asciiChar = fgetc(stdin);
+        
+        if (asciiChar == -1) {
+            if (ongoingLine) {
+                lineCnt++;
+            }
+            break;        
+        } 
+
+        if (asciiChar == '/' && prevChar == '/' && !ongoingBlock && !ongoingLine) {
+            ongoingLine = 1;
+        } 
+        
+        if (prevChar == '/' && asciiChar == '*'  && !ongoingBlock && !ongoingLine) {
+            ongoingBlock = 1;
+        } 
+        
+        if (prevChar == '*' && asciiChar == '/' && ongoingBlock && separation) {
+            blockCnt++;
+            ongoingBlock = 0;
+        } 
+        
+        if ((asciiChar == '\n' || asciiChar == '\r') && ongoingLine && !ongoingBlock) {
+            lineCnt++;
+            ongoingLine = 0;
+        }  
+
+        if (asciiChar != '/' || asciiChar != '*') {
+            separation = 1;
+        }
+
+        if (asciiChar == '\n' || asciiChar == '\r') {
+            prevChar = 0;
+        } else {
+            prevChar = asciiChar;
+        }
+    }
+    *line_comment_counter = lineCnt;
+    *block_comment_counter = blockCnt;
 }
 
 int main(void) {
