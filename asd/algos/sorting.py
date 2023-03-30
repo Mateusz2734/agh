@@ -141,3 +141,41 @@ def bubblesort(T):
                 T[j], T[j+1] = T[j+1], T[j]
     return T
 
+#-----------QUICKSELECT---------------
+
+def partition(T, p, r):
+    # y = random.randint(p, r)
+    # albo
+    # y = med(random.randint(p, r), p, r)
+    # T[y], T[r] = T[r], T[y]
+    x = T[r]
+    i = p - 1
+    for j in range(p, r):
+        if T[j] >= x:
+            i += 1
+            T[i], T[j] = T[j], T[i]
+    T[i + 1], T[r] = T[r], T[i + 1]
+    return i + 1
+
+# def med(T, a, b, c):
+#     if (T[b] < T[a] and T[a] < T[c]) or (T[c] < T[a] and T[a] < T[b]):
+#         return a
+#     if (T[a] < T[b] and T[b] < T[c]) or (T[c] < T[b] and T[b] < T[a]):
+#         return b
+#     else:
+#         return c
+
+# k-th largest element
+def quickselect(T, p, r, i):
+    if p == r:
+        print(T)
+        return T[p]
+    q = partition(T, p, r)
+    k = q - p + 1
+    if i == k:
+        print(T)
+        return T[q]
+    elif i < k:
+        return quickselect(T, p, q - 1, i)
+    else:
+        return quickselect(T, q + 1, r, i - k)
