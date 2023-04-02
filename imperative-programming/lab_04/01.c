@@ -157,8 +157,8 @@ void bigram_count(int bigram_no, int bigram[]) {
 void find_comments(int *line_comment_counter, int *block_comment_counter) {
     int blockCnt = 0, lineCnt = 0;
     int ongoingBlock = 0, ongoingLine = 0;
-    int prevChar = 0;
-    int separation = 0;
+    int prevChar = 0, separation = 0, blockChars = 0;
+
     while(!feof(stdin)) {
         int asciiChar = fgetc(stdin);
         
@@ -167,7 +167,15 @@ void find_comments(int *line_comment_counter, int *block_comment_counter) {
                 lineCnt++;
             }
             break;        
-        } 
+        }
+
+        if (ongoingBlock) {
+            blockChars++;
+        }
+
+        if (asciiChar != '/' && asciiChar != '*') {
+            separation = 1;
+        }
 
         if (asciiChar == '/' && prevChar == '/' && !ongoingBlock && !ongoingLine) {
             ongoingLine = 1;
@@ -175,21 +183,18 @@ void find_comments(int *line_comment_counter, int *block_comment_counter) {
         
         if (prevChar == '/' && asciiChar == '*'  && !ongoingBlock && !ongoingLine) {
             ongoingBlock = 1;
+            blockChars = 2;
         } 
         
-        if (prevChar == '*' && asciiChar == '/' && ongoingBlock && separation) {
+        if (prevChar == '*' && asciiChar == '/' && ongoingBlock && separation && blockChars > 3) {
             blockCnt++;
             ongoingBlock = 0;
-        } 
+        }
         
         if ((asciiChar == '\n' || asciiChar == '\r') && ongoingLine && !ongoingBlock) {
             lineCnt++;
             ongoingLine = 0;
         }  
-
-        if (asciiChar != '/' || asciiChar != '*') {
-            separation = 1;
-        }
 
         if (asciiChar == '\n' || asciiChar == '\r') {
             prevChar = 0;
