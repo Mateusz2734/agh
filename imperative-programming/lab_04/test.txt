@@ -82,6 +82,8 @@ int main() {
     return 0;
 }
 
+ids3.txt
+
 #include <stdio.h>
 #include <math.h>
 #define N 100
