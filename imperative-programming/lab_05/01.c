@@ -3,39 +3,22 @@
 
 #define SIZE 40
 
-void read_vector(double x[], int n) {
-	for(int i = 0; i < n; ++i) {
-		scanf("%lf", x++);
-	}
-}
-
-void print_vector(double x[], int n) {
-	for(int i = 0; i < n; ++i) {
-		printf("%.4f ", x[i]);
-	}
-	printf("\n");
-}
-
-void read_mat(double A[][SIZE], int m, int n) {
-	for(int i = 0; i < m; ++i) {
-		for(int j = 0; j < n; ++j) {
-			scanf("%lf", &A[i][j]);
-		}
-	}
-}
-
-void print_mat(double A[][SIZE], int m, int n) {
-	for(int i = 0; i < m; ++i) {
-		for(int j = 0; j < n; ++j) {
-			printf("%.4f ", A[i][j]);
-		}
-		printf("\n");
-	}
-}
+void read_vector(double x[], int n);
+void print_vector(double x[], int n);
+void read_mat(double A[][SIZE], int m, int n);
+void print_mat(double A[][SIZE], int m, int n);
 
 // 1. Calculate matrix product, AB = A X B
 // A[m][p], B[p][n], AB[m][n]
 void mat_product(double A[][SIZE], double B[][SIZE], double AB[][SIZE], int m, int p, int n) {
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			AB[i][j] = 0;
+			for (int k = 0; k < p; k++) {
+				AB[i][j] += A[i][k] * B[k][j];
+			}
+		}
+	}
 }
 
 
@@ -43,6 +26,12 @@ void mat_product(double A[][SIZE], double B[][SIZE], double AB[][SIZE], int m, i
 // (no rows' swaps). If A[i][i] == 0, function returns NAN.
 // Function may change A matrix elements.
 double gauss_simplified(double A[][SIZE], int n) {
+	// Check if A[i][i] == 0
+	for (int i; i < n; i++) {
+		if (A[i][i] == 0) {
+			return NAN;
+		}
+	}
 }
 
 void backward_substitution_index(double A[][SIZE], const int indices[], double x[], int n) {
@@ -107,3 +96,42 @@ int main(void) {
 	return 0;
 }
 
+void read_vector(double x[], int n) {
+	for(int i = 0; i < n; ++i) {
+		scanf("%lf", x++);
+	}
+}
+
+void print_vector(double x[], int n) {
+	for(int i = 0; i < n; ++i) {
+		printf("%.4f ", x[i]);
+	}
+	printf("\n");
+}
+
+void read_mat(double A[][SIZE], int m, int n) {
+	for(int i = 0; i < m; ++i) {
+		for(int j = 0; j < n; ++j) {
+			scanf("%lf", &A[i][j]);
+		}
+	}
+}
+
+void print_mat(double A[][SIZE], int m, int n) {
+	for(int i = 0; i < m; ++i) {
+		for(int j = 0; j < n; ++j) {
+			printf("%.4f ", A[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+int vector_max(double A[SIZE], int n) {
+	int max = 0;
+	for (int i = 0; i < n; i++) {
+		if (A[i] > max) {
+			max = A[i];
+		}
+	}
+	return max;
+}
