@@ -7,6 +7,9 @@ void read_vector(double x[], int n);
 void print_vector(double x[], int n);
 void read_mat(double A[][SIZE], int m, int n);
 void print_mat(double A[][SIZE], int m, int n);
+int vector_max(double A[SIZE], int n);
+int diagonal_zeros(double A[SIZE][SIZE], int n);
+int diagonal_almost_zeros(double A[SIZE][SIZE], int n, double eps);
 
 // 1. Calculate matrix product, AB = A X B
 // A[m][p], B[p][n], AB[m][n]
@@ -20,7 +23,6 @@ void mat_product(double A[][SIZE], double B[][SIZE], double AB[][SIZE], int m, i
 		}
 	}
 }
-
 
 // 2. Matrix triangulation and determinant calculation - simplified version
 // (no rows' swaps). If A[i][i] == 0, function returns NAN.
@@ -134,4 +136,24 @@ int vector_max(double A[SIZE], int n) {
 		}
 	}
 	return max;
+}
+
+int diagonal_zeros(double A[SIZE][SIZE], int n) {
+	int zeros = 0;
+	for (int i = 0; i < n; i++) {
+		if (A[i][i] == 0) {
+			zeros++;
+		}
+	}
+	return zeros;
+}
+
+int diagonal_almost_zeros(double A[SIZE][SIZE], int n, double eps) {
+	int zeros = 0;
+	for (int i = 0; i < n; i++) {
+		if (fabs(A[i][i]) < eps) {
+			zeros++;
+		}
+	}
+	return zeros;
 }
