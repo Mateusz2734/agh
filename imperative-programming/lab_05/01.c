@@ -10,6 +10,7 @@ void print_mat(double A[][SIZE], int m, int n);
 int vector_max(double A[SIZE], int n);
 int diagonal_zeros(double A[SIZE][SIZE], int n);
 int diagonal_almost_zeros(double A[SIZE][SIZE], int n, double eps);
+int is_upper_triangular(double A[SIZE][SIZE], int n);
 
 // 1. Calculate matrix product, AB = A X B
 // A[m][p], B[p][n], AB[m][n]
@@ -28,12 +29,27 @@ void mat_product(double A[][SIZE], double B[][SIZE], double AB[][SIZE], int m, i
 // (no rows' swaps). If A[i][i] == 0, function returns NAN.
 // Function may change A matrix elements.
 double gauss_simplified(double A[][SIZE], int n) {
-	// Check if A[i][i] == 0
-	for (int i; i < n; i++) {
-		if (A[i][i] == 0) {
-			return NAN;
+	double det = 1;
+	if (diagonal_zeros(A, n)) {
+		return NAN;
+	}
+
+	while (!is_upper_triangular(A, n)) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < i; j++) {
+				double factor = A[i][j] / A[j][j];
+				for (int k = 0; k < n; k++) {
+					A[i][k] -= factor * A[j][k];
+				}
+			}
 		}
 	}
+	
+	for (int i = 0; i < n; i++) {
+		det *= A[i][i];
+	}
+	
+	return det;
 }
 
 void backward_substitution_index(double A[][SIZE], const int indices[], double x[], int n) {
@@ -156,4 +172,15 @@ int diagonal_almost_zeros(double A[SIZE][SIZE], int n, double eps) {
 		}
 	}
 	return zeros;
+}
+
+int is_upper_triangular(double A[SIZE][SIZE], int n) {
+	for (int i = 1; i < n; i++) {
+		for (int j = 0; j < i; j++) {
+			if (A[i][j] != 0) {
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
