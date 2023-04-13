@@ -7,10 +7,16 @@ void read_vector(double x[], int n);
 void print_vector(double x[], int n);
 void read_mat(double A[][SIZE], int m, int n);
 void print_mat(double A[][SIZE], int m, int n);
-int vector_max(double A[SIZE], int n);
 int diagonal_zeros(double A[SIZE][SIZE], int n);
 int diagonal_almost_zeros(double A[SIZE][SIZE], int n, double eps);
 int is_upper_triangular(double A[SIZE][SIZE], int n);
+void swap_rows(double A[SIZE][SIZE], int n, int i, int j);
+void backward_substitution(double A[][SIZE], double b[SIZE], double x[SIZE], int n);
+void swap_indices(int indices[], int i, int j);
+void swap_double(double *a, double *b);
+int column_max(double A[][SIZE], int n, int k);
+void generate_indices(int indices[], int n);
+int max_diagonal_lt_eps(double A[][SIZE], int n, double eps);
 
 // 1. Calculate matrix product, AB = A X B
 // A[m][p], B[p][n], AB[m][n]
@@ -52,16 +58,51 @@ double gauss_simplified(double A[][SIZE], int n) {
 	return det;
 }
 
-void backward_substitution_index(double A[][SIZE], const int indices[], double x[], int n) {
-}
-
 // 3. Matrix triangulation, determinant calculation, and Ax = b solving - extended version
 // (Swap the rows so that the row with the largest, leftmost nonzero entry is on top. While
 // swapping the rows use index vector - do not copy entire rows.)
 // If max A[i][i] < eps, function returns 0.
 // If det != 0 && b != NULL && x != NULL then vector x should contain solution of Ax = b.
+double gauss(double A[][SIZE], double b[], double x[], const int n, const double eps) {
+    int indices[SIZE];
+	double det = 1;
+	int max;
 
-double gauss(double A[][SIZE], const double b[], double x[], const int n, const double eps) {
+    generate_indices(indices, n);
+
+    for (int i = 0; i < n; i++) {
+		if (max_diagonal_lt_eps(A, n, eps)) {
+			return 0;
+		}
+
+		if (is_upper_triangular(A, n)) {
+			break;
+		}
+		max = column_max(A, n, i);
+        if (max != i) {
+            swap_rows(A, n, i, max);
+            swap_indices(indices, i, max);
+            swap_double(&b[i], &b[max]);
+            det *= -1;
+        }
+        for (int j = i + 1; j < n; j++) {
+            double factor = A[j][i] / A[i][i];
+            for (int k = i; k < n; k++) {
+                A[j][k] -= factor * A[i][k];
+            }
+            b[j] -= factor * b[i];
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        det *= A[i][i];
+    }
+
+	if (det != 0 && b != NULL && x != NULL) {
+		backward_substitution(A, b, x, n);
+	}
+
+    return det;
 }
 
 // 4. Returns the determinant; B contains the inverse of A (if det(A) != 0)
@@ -144,16 +185,6 @@ void print_mat(double A[][SIZE], int m, int n) {
 	}
 }
 
-int vector_max(double A[SIZE], int n) {
-	int max = 0;
-	for (int i = 0; i < n; i++) {
-		if (A[i] > max) {
-			max = A[i];
-		}
-	}
-	return max;
-}
-
 int diagonal_zeros(double A[SIZE][SIZE], int n) {
 	int zeros = 0;
 	for (int i = 0; i < n; i++) {
@@ -183,4 +214,73 @@ int is_upper_triangular(double A[SIZE][SIZE], int n) {
 		}
 	}
 	return 1;
+}
+
+int spec_is_upper_triangular(double A[SIZE][SIZE], int n, double eps) {
+	for (int i = 1; i < n; i++) {
+		for (int j = 0; j < i; j++) {
+			if (A[i][j] < eps) {
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
+void swap_rows(double A[SIZE][SIZE], int n, int i, int j) {
+	double temp;
+	for (int k = 0; k < n; k++) {
+		temp = A[i][k];
+		A[i][k] = A[j][k];
+		A[j][k] = temp;
+	}
+}
+
+void backward_substitution(double A[][SIZE], double b[SIZE], double x[SIZE], int n) {
+    for (int i = n - 1; i >= 0; i--) {
+        double sum = 0;
+        for (int j = i + 1; j < n; j++) {
+            sum += A[i][j] * x[j];
+        }
+        x[i] = (b[i] - sum) / A[i][i];
+    }
+}
+
+void swap_indices(int indices[], int i, int j) {
+    int temp = indices[i];
+    indices[i] = indices[j];
+    indices[j] = temp;
+}
+
+void swap_double(double *a, double *b) {
+    double temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int column_max(double A[][SIZE], int n, int k) {
+    int max = -1, max_id = -1;
+    for (int i = k; i < n; i++) {
+        if (A[i][k] > max) {
+            max = A[i][k];
+            max_id = i;
+        }
+    }
+    return max_id;
+}
+
+void generate_indices(int indices[], int n) {
+    for (int i = 0; i < n; i++) {
+        indices[i] = i;
+    }
+}
+
+int max_diagonal_lt_eps(double A[][SIZE], int n, double eps) {
+	double max = -1;
+	for (int i = 0; i < n; i++) {
+		if (fabs(A[i][i]) > max) {
+			max = fabs(A[i][i]);
+		}
+	}
+	return max < eps;
 }
