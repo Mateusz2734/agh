@@ -10,3 +10,6 @@ cmake*
 
 # Python cache
 __pycache__
+
+# VSCode config
+.vscode
