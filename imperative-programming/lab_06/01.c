@@ -80,7 +80,9 @@ int add_relation (pair *tab, int n, pair new_pair) {
 	}
 	if (!found) {
 		tab[n] = new_pair;
+		return n+1;
 	}
+	return n;
 }
 
 // Read number of pairs, n, and then n pairs of ints
@@ -321,6 +323,18 @@ int find_min_elements(const pair *relation, int size, int *min_elements) {
 };
 
 int composition(const pair *relation, int size, const pair *relation_2, int size_2, pair *comp_relation) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	int comp_len = 0;
+	for (int i = 0; i < size; i++) {
+		for (int y = 0; y < n; y++) {
+			if (search_in_relation(relation_2, size_2, relation[i].second, domain[y])) {
+				pair new_pair = {relation[i].first, domain[y]};
+				comp_len = add_relation(comp_relation, comp_len, new_pair);
+			}
+		}
+	}
+	return comp_len;
 };
 
 int search_in_relation(const pair *relation, int size, int first, int second) {
