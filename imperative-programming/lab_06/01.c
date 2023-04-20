@@ -54,27 +54,46 @@ int is_connected(const pair*, int);
 int find_max_elements(const pair*, int, int*);
 int find_min_elements(const pair*, int, int*);
 int get_domain(const pair*, int, int*);
+int search_in_relation(const pair*, int, int, int);
 
 // Case 3:
 
-int composition (const pair*, int, const pair*, int, pair*);
+int composition(const pair*, int, const pair*, int, pair*);
 
 // Comparator for pair
-int cmp_pair (const void *a, const void *b) {
+int cmp_pair(const void *a, const void *b) {
 }
 
-int insert_int (int *tab, int n, int new_element) {
+int insert_int(int *tab, int n, int new_element) {
 }
 
 // Add pair to existing relation if not already there
 int add_relation (pair *tab, int n, pair new_pair) {
+	int found = 0;
+	for (int i = 0; i < n; i++) {
+		if (tab[i].first == new_pair.first && tab[i].second == new_pair.second) {
+			found = 1;
+		}
+	}
+	if (!found) {
+		tab[n] = new_pair;
+	}
 }
 
 // Read number of pairs, n, and then n pairs of ints
 int read_relation(pair *relation) {
+	int n;
+	scanf("%d\n", &n);
+	for (int i = 0; i < n; i++) {
+		scanf("%d %d", &relation[i].first, &relation[i].second);
+	}
+	return n;
 }
 
 void print_int_array(const int *array, int n) {
+	for (int i = 0; i < n; i++) {
+		printf("%d ", array[i]);
+	}
 }
 
 int main(void) {
@@ -121,3 +140,122 @@ int main(void) {
 	return 0;
 }
 
+int is_reflexive(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	for (int i = 0; i < n; i++) {
+		if(!search_in_relation(relation, size, domain[i], domain[i])) {
+			return 0;
+		}
+	}
+	return 1;
+};
+
+int is_irreflexive(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	for (int i = 0; i < n; i++) {
+		if(search_in_relation(relation, size, domain[i], domain[i])) {
+			return 0;
+		}
+	}
+	return 1;
+};
+
+int is_symmetric(const pair *relation, int size) {
+	for (int i = 0; i < size; i++) {
+		if (!search_in_relation(relation, size, relation[i].second, relation[i].first)) {
+			return 0;
+		}
+	}
+	return 1;
+};
+
+int is_antisymmetric(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (search_in_relation(relation, size, domain[i], domain[j]) && search_in_relation(relation, size, domain[j], domain[i]) && domain[i] != domain[j]) {
+				return 0;
+			}
+		}
+	}
+	return 1;
+};
+
+int is_asymmetric(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (search_in_relation(relation, size, domain[i], domain[j]) && search_in_relation(relation, size, domain[j], domain[i])) {
+				return 0;
+			}
+		}
+	}
+	return 1;
+};
+
+int is_transitive(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	for (int x = 0; x < n; x++) {
+		for (int y = 0; y < n; y++) {
+			for (int z = 0; z < n; z++) {
+				if (search_in_relation(relation, size, domain[x], domain[y]) && search_in_relation(relation, size, domain[y], domain[z]) && !search_in_relation(relation, size, domain[x], domain[z])) {
+					return 0;
+				}
+			}
+		}
+	}
+	return 1;
+};
+
+int is_partial_order(const pair *relation, int size) {
+};
+
+int is_total_order(const pair *relation, int size) {
+};
+
+int search_int_in_array(const int *array, int n, int element) {
+	for (int i = 0; i < n; i++) {
+		if (array[i] == element) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int get_domain(const pair *relation, int size, int *domain) {
+	int n = 0;
+	for (int i = 0; i < size; i++) {
+		if (!search_int_in_array(domain, i, relation[i].first)) {
+			domain[i] = relation[i].first;
+		}
+		if (!search_int_in_array(domain, i, relation[i].second)) {
+			domain[i] = relation[i].second;
+		}
+		n++;
+	}
+	return n;
+};
+
+int find_max_elements(const pair *relation, int size, int *max_elements) {
+};
+
+int find_min_elements(const pair *relation, int size, int *min_elements) {
+};
+
+int composition(const pair *relation, int size, const pair *relation_2, int size_2, pair *comp_relation) {
+};
+
+int search_in_relation(const pair *relation, int size, int first, int second) {
+	for (int i = 0; i < size; i++) {
+		if (relation[i].first == first && relation[i].second == second) {
+			return 1;
+		}
+	}
+	return 0;
+}
