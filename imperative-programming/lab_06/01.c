@@ -55,6 +55,9 @@ int find_max_elements(const pair*, int, int*);
 int find_min_elements(const pair*, int, int*);
 int get_domain(const pair*, int, int*);
 int search_in_relation(const pair*, int, int, int);
+void bubble_sort(int *array, int n);
+int is_coherent(const pair *relation, int size);
+int remove_duplicates(int *array, int n);
 
 // Case 3:
 
@@ -94,6 +97,7 @@ void print_int_array(const int *array, int n) {
 	for (int i = 0; i < n; i++) {
 		printf("%d ", array[i]);
 	}
+	printf("\n");
 }
 
 int main(void) {
@@ -122,11 +126,14 @@ int main(void) {
 			ordered = is_partial_order(relation, size);
 			n_domain = get_domain(relation, size, domain);
 			printf("%d %d\n", ordered, is_total_order(relation, size));
+			printf("%d\n", n_domain);
 			print_int_array(domain, n_domain);
 			if (!ordered) break;
 			int no_max_elements = find_max_elements(relation, size, max_elements);
 			int no_min_elements = find_min_elements(relation, size, min_elements);
+			printf("%d\n", no_max_elements);
 			print_int_array(max_elements, no_max_elements);
+			printf("%d\n", no_min_elements);
 			print_int_array(min_elements, no_min_elements);
 			break;
 		case 3:
@@ -214,9 +221,24 @@ int is_transitive(const pair *relation, int size) {
 };
 
 int is_partial_order(const pair *relation, int size) {
+	return is_reflexive(relation, size) && is_antisymmetric(relation, size) && is_transitive(relation, size);
 };
 
+int is_coherent(const pair *relation, int size) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	for (int x = 0; x < n; x++) {
+		for (int y = 0; y < n; y++) {
+			if (!(search_in_relation(relation, size, domain[x], domain[y]) || search_in_relation(relation, size, domain[y], domain[x]))) {
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
 int is_total_order(const pair *relation, int size) {
+	return is_partial_order(relation, size) && is_coherent(relation, size);
 };
 
 int search_int_in_array(const int *array, int n, int element) {
@@ -226,26 +248,76 @@ int search_int_in_array(const int *array, int n, int element) {
 		}
 	}
 	return 0;
-}
+};
 
 int get_domain(const pair *relation, int size, int *domain) {
 	int n = 0;
 	for (int i = 0; i < size; i++) {
 		if (!search_int_in_array(domain, i, relation[i].first)) {
-			domain[i] = relation[i].first;
+			domain[n] = relation[i].first;
+			n++;
 		}
 		if (!search_int_in_array(domain, i, relation[i].second)) {
-			domain[i] = relation[i].second;
+			domain[n] = relation[i].second;
+			n++;
 		}
-		n++;
+		
 	}
+	bubble_sort(domain, n);
+	n = remove_duplicates(domain, n);
 	return n;
 };
 
+int search_in_firsts(const pair *relation, int size, int elem) {
+	for (int i = 0; i < size; i++) {
+		if (relation[i].first == elem && relation[i].second != elem) {
+			return 1;
+		}
+	}
+	return 0;
+};
+
 int find_max_elements(const pair *relation, int size, int *max_elements) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	int max_len = 0;
+	for (int i = 0; i < n; i++) {
+		if (!search_in_firsts(relation, size, domain[i])) {
+			if (!search_int_in_array(max_elements, max_len, domain[i])) {
+				max_elements[max_len] = domain[i];
+				max_len++;
+			}
+		}
+	}
+	bubble_sort(max_elements, max_len);
+	int new_len = remove_duplicates(max_elements, max_len);
+	return new_len;
+};
+
+int search_in_seconds(const pair *relation, int size, int elem) {
+	for (int i = 0; i < size; i++) {
+		if (relation[i].second == elem && relation[i].first != elem) {
+			return 1;
+		}
+	}
+	return 0;
 };
 
 int find_min_elements(const pair *relation, int size, int *min_elements) {
+	int domain[MAX_REL_SIZE];
+	int n = get_domain(relation, size, domain);
+	int min_len = 0;
+	for (int m = 0; m < n; m++) {
+		if (!search_in_seconds(relation, size, domain[m])) {
+			if (!search_int_in_array(min_elements, min_len, domain[m])) {
+				min_elements[min_len] = domain[m];
+				min_len++;
+			}
+		}
+	}
+	bubble_sort(min_elements, min_len);
+	int new_len = remove_duplicates(min_elements, min_len);
+	return new_len;
 };
 
 int composition(const pair *relation, int size, const pair *relation_2, int size_2, pair *comp_relation) {
@@ -258,4 +330,34 @@ int search_in_relation(const pair *relation, int size, int first, int second) {
 		}
 	}
 	return 0;
+};
+
+void bubble_sort(int *array, int n) {
+	int temp;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n - 1; j++) {
+			if (array[j] > array[j + 1]) {
+				temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+};
+
+int remove_duplicates(int *array, int n) {
+    if (n == 0 || n == 1)
+        return n;
+    int temp[n];
+    int j = 0;
+
+    for (int i = 0; i < n - 1; i++)
+        if (array[i] != array[i + 1])
+            temp[j++] = array[i];
+
+    temp[j++] = array[n - 1];
+
+    for (int i = 0; i < j; i++)
+        array[i] = temp[i];
+    return j;
 }
