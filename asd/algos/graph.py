@@ -20,18 +20,18 @@ def bfs(G, s):
     return (parent, visited)
 
 # -----BFS WITH ADJACENCY MATRIX-----
-def BFS(G, start):
+def BFS(G, s):
     n = len(G)
-    visited = [False] * n
-    q = [start]
-    visited[start] = True
-    while q:
-        vis = q[0]
+    visited = [False for _ in range(n)]
+    Q = deque()
+    visited[s] = True
+
+    while Q:
+        vis = Q.popleft()
         print(vis, end = ' ')
-        q.pop(0)
         for i in range(n):
             if (G[vis][i] == 1 and
                     (not visited[i])):
-                q.append(i)
+                Q.append(i)
                 visited[i] = True
     return visited
