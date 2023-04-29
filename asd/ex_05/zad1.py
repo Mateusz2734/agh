@@ -4,6 +4,7 @@
 # Pomysł: sortowanie topologiczne, ale wybieramy wierzchołek, który ma stopień wejściowy zero
 # Sprawdzamy, czy da się przejść od pierwszego do ostatniego
 
+# Złożoność: O(V + E)
 def topological_sort(G):
     n = len(G)
     visited = [False for _ in range(n)]
