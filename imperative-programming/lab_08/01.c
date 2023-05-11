@@ -9,6 +9,7 @@ typedef struct {
 	int year;
 } Date;
 
+/*------------------------PART 1--------------------------------*/
 // 1 bsearch2
 
 #define FOOD_MAX  30   // max. number of goods
@@ -26,27 +27,60 @@ typedef int (*ComparFp)(const void *, const void *);
 
 // compare dates
 int cmp_date(const void *d1, const void *d2) {
+	const Date *date1 = (Date*)d1;
+	const Date *date2 = (Date*)d2;
+
+	int date1_val = (date1->year * 2000) + (date1->month * 100) + date1->day;
+	int date2_val = (date2->year * 2000) + (date2->month * 100) + date2->day;
+
+	if (date1_val > date2_val) {
+		return 1;
+	} else if (date1_val < date2_val) {
+		return -1;
+	} else {
+		return 0;
+	}
 }
 
 // compare foods
 int cmp(const void *a, const void *b) {
+	const Food *food1 = (Food*)a;
+	const Food *food2 = (Food*)b;
+	//TODO
 }
 
 // bsearch returning address where to insert new element
 void *bsearch2 (const void *key, const void *base, size_t nmemb, size_t size, ComparFp compar, char *result) {
+	//TODO
 }
 
 // print goods of given name
 void print_art(Food *p, int n, char *art) {
+	for (int i = 0; i < n; i++) {
+		if (strcmp(p[i].name, art) == 0) {
+			printf("%s %.2f %d %d.%d.%d\n", p[i].name, p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
+		}
+	}
+	
 }
 
 // add record to table if absent
 Food* add_record(Food *tab, int *np, ComparFp compar, Food *new) {
+	//TODO
 }
 
 // read no lines of data
 // calls add_record if sorted = 1 and just adds element if sorted = 0
 int read_goods(Food *tab, int no, FILE *stream, int sorted) {
+	for (int i = 0; i < no; i++) {
+		Food new_food;
+		fscanf(stream, "%s %f %f %d.%d.%d", new_food.name, &new_food.price, &new_food.amount, &new_food.valid_date.day, &new_food.valid_date.month, &new_food.valid_date.year);
+		if (sorted) {
+			add_record(tab, &no, cmp, &new_food);
+		} else {
+			tab[i] = new_food;
+		}
+	}
 }
 
 int cmp_qs(const void *a, const void *b) {
@@ -62,8 +96,10 @@ int cmp_bs(const void *a, const void *b) {
 
 // finds the value of goods due on 'curr_date'
 float value(Food *food_tab, size_t n, Date curr_date, int days) {
+	//TODO
 }
 
+/*------------------------PART 3--------------------------------*/
 /////////////////////////////////////////////////////////////////
 // 3 Succession
 
@@ -100,15 +136,19 @@ int cmp_primo(Person *person1, Person *person2) {
 
 // compare persons
 int cmp_person(const void *a, const void *b) {
+	//TODO
 }
 
 int fill_indices_tab(Parent *idx_tab, Person *pers_tab, int size) {
+	//TODO
 }
 
 void persons_shifts(Person *person_tab, int size, Parent *idx_tab, int no_parents) {
+	//TODO
 }
 
 int cleaning(Person *person_tab, int n) {
+	//TODO
 }
 
 void print_person(const Person *p) {
@@ -116,6 +156,7 @@ void print_person(const Person *p) {
 }
 
 int create_list(Person *person_tab, int n) {
+	//TODO
 }
 
 int main(void) {
