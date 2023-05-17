@@ -42,46 +42,108 @@ int cmp_date(const void *d1, const void *d2) {
 	}
 }
 
+int cmp_price(const void *p1, const void *p2) {
+	const Food *food1 = (Food*)p1;
+	const Food *food2 = (Food*)p2;
+
+	if (food1->price > food2->price) {
+		return 1;
+	} else if (food1->price < food2->price) {
+		return -1;
+	} else {
+		return 0;
+	}
+}
+
+
 // compare foods
 int cmp(const void *a, const void *b) {
 	const Food *food1 = (Food*)a;
 	const Food *food2 = (Food*)b;
-	//TODO
+
+	int price_cmp = cmp_price(food1, food2);
+	int date_cmp = cmp_date(&food1->valid_date, &food2->valid_date);
+	if (price_cmp == 0) {
+		return date_cmp;
+	} else {
+		return price_cmp;
+	}
 }
 
 // bsearch returning address where to insert new element
 void *bsearch2 (const void *key, const void *base, size_t nmemb, size_t size, ComparFp compar, char *result) {
-	//TODO
+	int left = 0, right = nmemb - 1, mid;
+	while (left <= right) {
+		mid = (left + right) / 2;
+		int cmp = compar(key, base + mid * size);
+		if (cmp == 0) {
+			*result = 1;
+			return (void*)(base + mid * size);
+		} else if (cmp < 0) {
+			right = mid - 1;
+		} else {
+			left = mid + 1;
+		}
+	}
+	*result = 0;
+	return (void*)(base + left * size);
 }
 
 // print goods of given name
 void print_art(Food *p, int n, char *art) {
 	for (int i = 0; i < n; i++) {
 		if (strcmp(p[i].name, art) == 0) {
-			printf("%s %.2f %d %d.%d.%d\n", p[i].name, p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
+			printf("%.2f %d.00 %.2d.%.2d.%d\n", p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
 		}
 	}
 	
 }
 
-// add record to table if absent
+void print_food(Food *p, int n) {
+	for (int i = 0; i < n; i++) {
+		printf("%s %.2f %d %d.%d.%d\n", p[i].name, p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
+	}
+}
+
+// Food *add record(Food *tab, int *np, ComparFp compar, Food *new), która wywołuje funkcję bsearch2() sprawdzającą, czy nowy artykuł (jego dane są zapisane pos adresem *new) jest zapisany w tablicy tab o *np elementach. O tym, czy uznać *new za nowy
+// decyduje funkcja wskazywana pointerem do funkcji compar (typu ComparFP – zdefiniowanego w szablonie).
+// • Jeżeli *new nie jest elementem nowym, to dane zapisane w elemencie tablicy są modyfikowane danymi zapisanymi w *new – konkretnie – ilość artykułu znalezionego w
+// tablicy jest powiększana o ilość zapisaną w *new. Funkcja zwraca adres modyfikowanego elementu tablicy.
+// • Jeżeli *new jest elementem nowym, to funkcja add record dodaje we wskazanym
+// miejscu nowy element (z ewentualnym przesunięciem części elementów tablicy), zwiększa liczbę elementów tablicy *np i zwraca adres wpisanego elementu.
 Food* add_record(Food *tab, int *np, ComparFp compar, Food *new) {
-	//TODO
+	char result;
+	Food *found = bsearch2(new, tab, *np, sizeof(Food), compar, &result);
+	if (result) {
+		found->amount += new->amount;
+		return found;
+	} else {
+		(*np)++;
+		memmove(found + 1, found, (*np - 1) * sizeof(Food));
+		*found = *new;
+		return found;
+	}
 }
 
 // read no lines of data
 // calls add_record if sorted = 1 and just adds element if sorted = 0
 int read_goods(Food *tab, int no, FILE *stream, int sorted) {
+	int cnt = 0;
 	for (int i = 0; i < no; i++) {
 		Food new_food;
-		fscanf(stream, "%s %f %f %d.%d.%d", new_food.name, &new_food.price, &new_food.amount, &new_food.valid_date.day, &new_food.valid_date.month, &new_food.valid_date.year);
+		fscanf(stream, "%s %f %d %d.%d.%d", new_food.name, &new_food.price, &new_food.amount, &new_food.valid_date.day, &new_food.valid_date.month, &new_food.valid_date.year);
 		if (sorted) {
-			add_record(tab, &no, cmp, &new_food);
+			add_record(tab, &cnt, cmp, &new_food);
+			printf("cnt: %d %d\n", cnt, no);
+			// cnt += 1;
 		} else {
 			tab[i] = new_food;
 		}
 	}
+	return cnt;
 }
+
+/*------------------------PART 2--------------------------------*/
 
 int cmp_qs(const void *a, const void *b) {
 	Food *fa = (Food*)a, *fb = (Food*)b;
@@ -195,7 +257,6 @@ int main(void) {
 		{"Sienna", {F,yes}, {18, 9, 2021}, "Beatrice"},
 		{"August", {M,yes}, {9, 2, 2021}, "Eugenie"}
 	};
-
 	int to_do, no;
 	int n;
 	Food food_tab[FOOD_MAX];
