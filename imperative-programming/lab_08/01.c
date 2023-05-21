@@ -93,16 +93,10 @@ void *bsearch2 (const void *key, const void *base, size_t nmemb, size_t size, Co
 void print_art(Food *p, int n, char *art) {
 	for (int i = 0; i < n; i++) {
 		if (strcmp(p[i].name, art) == 0) {
-			printf("%.2f %d.00 %.2d.%.2d.%d\n", p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
+			printf("%.2f %d %.2d.%.2d.%d\n", p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
 		}
 	}
 	
-}
-
-void print_food(Food *p, int n) {
-	for (int i = 0; i < n; i++) {
-		printf("%s %.2f %d %d.%d.%d\n", p[i].name, p[i].price, p[i].amount, p[i].valid_date.day, p[i].valid_date.month, p[i].valid_date.year);
-	}
 }
 
 // Food *add record(Food *tab, int *np, ComparFp compar, Food *new), która wywołuje funkcję bsearch2() sprawdzającą, czy nowy artykuł (jego dane są zapisane pos adresem *new) jest zapisany w tablicy tab o *np elementach. O tym, czy uznać *new za nowy
@@ -134,13 +128,15 @@ int read_goods(Food *tab, int no, FILE *stream, int sorted) {
 		fscanf(stream, "%s %f %d %d.%d.%d", new_food.name, &new_food.price, &new_food.amount, &new_food.valid_date.day, &new_food.valid_date.month, &new_food.valid_date.year);
 		if (sorted) {
 			add_record(tab, &cnt, cmp, &new_food);
-			printf("cnt: %d %d\n", cnt, no);
-			// cnt += 1;
 		} else {
 			tab[i] = new_food;
 		}
 	}
-	return cnt;
+	if (sorted) {
+		return cnt;
+	} else {
+		return no;
+	}
 }
 
 /*------------------------PART 2--------------------------------*/
@@ -158,7 +154,20 @@ int cmp_bs(const void *a, const void *b) {
 
 // finds the value of goods due on 'curr_date'
 float value(Food *food_tab, size_t n, Date curr_date, int days) {
-	//TODO
+	float output = 0;
+	struct tm due_date_struct = {.tm_year=curr_date.year-1900, .tm_mon=curr_date.month-1, .tm_mday=curr_date.day};
+	time_t due_date = mktime(&due_date_struct);
+	due_date += days * 24 * 60 * 60;
+	qsort(food_tab, n, sizeof(Food), cmp_qs);
+	for (size_t i = 0; i < n; i++) {
+		struct tm date_struct = {.tm_year=food_tab[i].valid_date.year-1900, .tm_mon=food_tab[i].valid_date.month-1, .tm_mday=food_tab[i].valid_date.day};
+		time_t date = mktime(&date_struct);
+		if (date == due_date) {
+			output += food_tab[i].price * food_tab[i].amount;
+		}
+
+	}
+	return output;
 }
 
 /*------------------------PART 3--------------------------------*/
