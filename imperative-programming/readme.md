@@ -1,0 +1,24 @@
+# Imperative programming solutions
+- Lab 00:
+    - No testing, just simple exercises
+- Lab 01:
+    - 01.c: 100%
+- Lab 02:
+    - 01.c: 100%
+    - 02.c: 100%
+    - 03.c: 50%
+- Lab 03:
+    - 01.c: 100%
+- Lab 04:
+    - 01.c: 80%
+    - 02.c: 0% (not started)
+- Lab 05:
+    - 01.c: 60%
+- Lab 06:
+    - 01.c: 100%
+- Lab 07:
+    - 01.c: 0% (not started)
+- Lab 08:
+    - 01.c: 75%
+- Lab 09:
+    - 01.c: 0% (not started)
