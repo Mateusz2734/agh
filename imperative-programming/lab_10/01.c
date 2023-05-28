@@ -24,87 +24,152 @@ typedef void(*print_ptr)(const void*);
 
 // Allocate vector to initial capacity (block_size elements),
 // Set element_size, size (to 0), capacity
-void init_vector(Vector *vector, size_t block_size, size_t element_size) {}
+void init_vector(Vector *vector, size_t block_size, size_t element_size) {
+	vector->data = malloc(block_size * element_size);
+	vector->element_size = element_size;
+	vector->size = 0;
+	vector->capacity = block_size;
+}
 
 // If new_capacity is greater than the current capacity,
 // new storage is allocated, otherwise the function does nothing.
-void reserve(Vector *vector, size_t new_capacity) {}
+void reserve(Vector *vector, size_t new_capacity) {
+	// TODO
+}
 
 // Resizes the vector to contain new_size elements.
 // If the current size is greater than new_size, the container is
 // reduced to its first new_size elements.
-
 // If the current size is less than new_size,
 // additional zero-initialized elements are appended
-void resize(Vector *vector, size_t new_size) {}
+void resize(Vector *vector, size_t new_size) {
+	// TODO
+}
 
 // Add element to the end of the vector
-void push_back(Vector *vector, void *value) {}
+void push_back(Vector *vector, void *value) {
+	// TODO
+}
 
 // Remove all elements from the vector
-void clear(Vector *vector) {}
+void clear(Vector *vector) {
+	// TODO
+}
 
 // Insert new element at index (0 <= index <= size) position
-void insert(Vector *vector, size_t index, void *value) {}
+void insert(Vector *vector, size_t index, void *value) {
+    resize(vector, vector->size + 1);
+    char *ptr = (char *)vector->data;
+    memmove(ptr + vector->element_size * (index + 1), ptr + vector->element_size * index, vector->element_size * (vector->size - index));
+    memcpy(ptr + vector->element_size * index, value, vector->element_size);
+}
 
 // Erase element at position index
-void erase(Vector *vector, size_t index) {}
+void erase(Vector *vector, size_t index) {
+    char *ptr = (char *)vector->data;
+    memmove(ptr + vector->element_size * index, ptr + vector->element_size * (index + 1), vector->element_size * (vector->size - index));
+    vector->size -= 1;
+}
 
 // Erase all elements that compare equal to value from the container
-void erase_value(Vector *vector, void *value, cmp_ptr cmp) {}
+void erase_value(Vector *vector, void *value, cmp_ptr cmp) {
+	// TODO
+}
 
 // Erase all elements that satisfy the predicate from the vector
-void erase_if(Vector *vector, int (*predicate)(void *)) {}
+void erase_if(Vector *vector, int (*predicate)(void *)) {
+	// TODO
+}
 
 // Request the removal of unused capacity
-void shrink_to_fit(Vector *vector) {}
+void shrink_to_fit(Vector *vector) {
+	// TODO
+}
 
 // integer comparator
-int int_cmp(const void *v1, const void *v2) {}
+int int_cmp(const void *v1, const void *v2) {
+	// TODO
+}
 
 // char comparator
-int char_cmp(const void *v1, const void *v2) {}
+int char_cmp(const void *v1, const void *v2) {
+	// TODO
+}
 
 // Person comparator:
 // Sort according to age (decreasing)
 // When ages equal compare first name and then last name
-int person_cmp(const void *p1, const void *p2) {}
+int person_cmp(const void *p1, const void *p2) {
+	// TODO
+}
 
 // predicate: check if number is even
-int is_even(void *value) {}
+int is_even(void *value) {
+	int *v = (int *)value;
+	return *v % 2 == 0;
+}
 
 // predicate: check if char is a vowel
-int is_vowel(void *value) {}
+int is_vowel(void *value) {
+	char *v = (char *)value;
+	return strchr("aeiouy", tolower(*v)) != NULL;
+}
 
 // predicate: check if person is older than 25
-int is_older_than_25(void *person) {}
+int is_older_than_25(void *person) {
+	Person *p = (Person *)person;
+	return p->age > 25;
+}
 
 // print integer value
 void print_int(const void *v) {
+	printf("%d ", *(int *)v);
 }
 
 // print char value
 void print_char(const void *v) {
+	printf("%c ", *(char *)v);
 }
 
 // print structure Person
 void print_person(const void *v) {
+	Person *p = (Person *)v;
+	printf("%d %s %s\n", p->age, p->first_name, p->last_name);
 }
 
 // print capacity of the vector and its elements
 void print_vector(Vector *vector, print_ptr print) {
+	printf("%zu\n", vector->capacity);
+	for (size_t i = 0; i < vector->size; ++i) {
+		// TODO: check if cast is needed
+		print((char *)vector->data + i * vector->element_size);
+	}
+	printf("\n");
 }
 
 // read int value
 void read_int(void* value) {
+	scanf("%d", (int *)value);
 }
 
 // read char value
 void read_char(void* value) {
+	// TODO: check if space is needed
+	scanf(" %c", (char *)value);
 }
 
 // read struct Person
 void read_person(void* value) {
+	Person *p = (Person *)value;
+	scanf("%d %s %s", &p->age, p->first_name, p->last_name);
+}
+
+void *safe_malloc(size_t size) {
+	void *p = malloc(size);
+	if (p == NULL) {
+		exit(EXIT_FAILURE);
+	}
+	return p;
 }
 
 void vector_test(Vector *vector, size_t block_size, size_t elem_size, int n, read_ptr read,
