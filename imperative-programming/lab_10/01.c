@@ -34,7 +34,12 @@ void init_vector(Vector *vector, size_t block_size, size_t element_size) {
 // If new_capacity is greater than the current capacity,
 // new storage is allocated, otherwise the function does nothing.
 void reserve(Vector *vector, size_t new_capacity) {
-	// TODO
+	//FIXME: have to check if it works properly
+	if (new_capacity <= vector->capacity) {
+		return;
+	}
+	vector->data = realloc(vector->data, new_capacity * vector->element_size);
+	vector->capacity = new_capacity;
 }
 
 // Resizes the vector to contain new_size elements.
@@ -43,17 +48,37 @@ void reserve(Vector *vector, size_t new_capacity) {
 // If the current size is less than new_size,
 // additional zero-initialized elements are appended
 void resize(Vector *vector, size_t new_size) {
-	// TODO
+	if (vector->size > new_size) {
+		vector->data = realloc(vector->data, new_size * vector->element_size);
+	} else if (vector->size < new_size) {
+		reserve(vector, new_size);
+		char *ptr = (char *)vector->data;
+		memset(ptr + vector->element_size * vector->size, 0, vector->element_size * (new_size - vector->size));
+	}
 }
 
 // Add element to the end of the vector
 void push_back(Vector *vector, void *value) {
-	// TODO
+	//FIXME: have to check if it works properly
+	if (vector->size + 1 == vector->capacity) {
+		reserve(vector, vector->capacity * 2);
+	}
+	char *ptr = (char *)vector->data;
+	memcpy(ptr + vector->element_size * vector->size, value, vector->element_size);
+	vector->size += 1;
+	
 }
 
 // Remove all elements from the vector
 void clear(Vector *vector) {
-	// TODO
+	//FIXME: have to check if it works properly
+	char *ptr = (char *)vector->data;
+
+	for (size_t i = 0; i < vector->size; i++) {
+		memset(ptr + vector->element_size * i, 0, vector->element_size);
+	}
+
+	vector->size = 0;
 }
 
 // Insert new element at index (0 <= index <= size) position
@@ -73,34 +98,87 @@ void erase(Vector *vector, size_t index) {
 
 // Erase all elements that compare equal to value from the container
 void erase_value(Vector *vector, void *value, cmp_ptr cmp) {
-	// TODO
+	//FIXME: have to check if it works properly
+	for (size_t i = 0; i < vector->size; i++) {
+		if (cmp(value, (char*)vector->data + vector->element_size * i) == 0) {
+			erase(vector, i);
+			i--;
+		}
+	}
 }
 
 // Erase all elements that satisfy the predicate from the vector
 void erase_if(Vector *vector, int (*predicate)(void *)) {
-	// TODO
+	//FIXME: have to check if it works properly
+	for (size_t i = 0; i < vector->size; i++) {
+		if (predicate((char*)vector->data + vector->element_size * i)) {
+			erase(vector, i);
+			i--;
+		}
+	}
 }
 
 // Request the removal of unused capacity
 void shrink_to_fit(Vector *vector) {
-	// TODO
+	if (vector->size == vector->capacity) {
+		return;
+	}
+	vector->data = realloc(vector->data, vector->size * vector->element_size);
+	vector->capacity = vector->size;
 }
 
 // integer comparator
 int int_cmp(const void *v1, const void *v2) {
-	// TODO
+	int val1 = *(int *)v1;
+	int val2 = *(int *)v2;
+	if (val1 < val2) {
+		return -1;
+	} else if (val1 > val2) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 // char comparator
 int char_cmp(const void *v1, const void *v2) {
-	// TODO
+	char val1 = *(char *)v1;
+	char val2 = *(char *)v2;
+
+	if (val1 < val2) {
+		return -1;
+	} else if (val1 > val2) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 // Person comparator:
 // Sort according to age (decreasing)
 // When ages equal compare first name and then last name
 int person_cmp(const void *p1, const void *p2) {
-	// TODO
+	Person *person1 = (Person *)p1;
+	Person *person2 = (Person *)p2;
+
+	int age_cmp = int_cmp(&person1->age, &person2->age);
+
+	if (age_cmp != 0) {
+		return -age_cmp;
+	}
+
+	int first_name_cmp = strcmp(person1->first_name, person2->first_name);
+    int last_name_cmp = strcmp(person1->last_name, person2->last_name);
+
+	if (first_name_cmp != 0) {
+		return first_name_cmp > 0 ? 1 : -1;
+	} 
+
+    if (last_name_cmp != 0) {
+        return last_name_cmp > 0 ? 1 : -1;
+    }
+
+    return 0;
 }
 
 // predicate: check if number is even
@@ -140,8 +218,8 @@ void print_person(const void *v) {
 // print capacity of the vector and its elements
 void print_vector(Vector *vector, print_ptr print) {
 	printf("%zu\n", vector->capacity);
-	for (size_t i = 0; i < vector->size; ++i) {
-		// TODO: check if cast is needed
+	for (size_t i = 0; i < vector->size; i++) {
+		// FIXME: check if cast is needed
 		print((char *)vector->data + i * vector->element_size);
 	}
 	printf("\n");
@@ -154,7 +232,7 @@ void read_int(void* value) {
 
 // read char value
 void read_char(void* value) {
-	// TODO: check if space is needed
+	// FIXME: check if space is needed
 	scanf(" %c", (char *)value);
 }
 
@@ -175,11 +253,14 @@ void *safe_malloc(size_t size) {
 void vector_test(Vector *vector, size_t block_size, size_t elem_size, int n, read_ptr read,
 		 cmp_ptr cmp, predicate_ptr predicate, print_ptr print) {
 	init_vector(vector, block_size, elem_size);
-	void *v = safe_malloc(vector->element_size);
+	void *v = malloc(vector->element_size);
 	size_t index, size;
 	for (int i = 0; i < n; ++i) {
 		char op;
 		scanf(" %c", &op);
+
+		printf("Operation: %c Vector: ", op);
+		print_vector(vector, print);
 		switch (op) {
 			case 'p': // push_back
 				read(v);
@@ -222,7 +303,7 @@ void vector_test(Vector *vector, size_t block_size, size_t elem_size, int n, rea
 	}
 	print_vector(vector, print);
 	free(vector->data);
-	free(v);
+	// free(v);
 }
 
 int main(void) {
