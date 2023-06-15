@@ -94,34 +94,58 @@ void skip_forward(iterator* itr, size_t n) {
 
 // forward iteration - get n-th element in the list
 int get_forward(List *list, size_t n) {
-	iterator it = begin(list->head);
-	skip_forward(&it, n);
-	int value = it.node_ptr->data[it.position];
-	return value;
+	iterator itr = begin(list->head);
+	skip_forward(&itr, n);
+	int nth = itr.node_ptr->data[itr.position];
+	return nth;
 }
 
 // set iterator to move n elements backward from its current position
 void skip_backward(iterator* itr, size_t n) {
+	itr->node_ptr = itr->node_ptr->prev;
+
+	while (n > 0) {
+		if (itr->node_ptr->array_size < n) {
+			n -= itr->node_ptr->array_size;
+			itr->node_ptr = itr->node_ptr->prev;
+		} else {
+			itr->position = itr->node_ptr->array_size - n;
+			n = 0;
+		}
+	}
 }
 
 // backward iteration - get n-th element from the end of the list
 int get_backward(List *list, size_t n) {
+	iterator itr = end(list->tail);
+	skip_backward(&itr, n);
+	int nth = itr.node_ptr->data[itr.position];
+	return nth;
 }
 
 void remove_node(Node *node_ptr) {
+	// TODO: implement
 }
 
 // remove n-th element; if array empty remove node
 void remove_at(List *list, size_t n) {
+	// TODO: implement
 }
 
 // return the number of digits of number n
 size_t digits(int n) {
+	size_t count = 0;
+	while (n != 0) {
+		n /= 10;
+		count++;
+	}
+	return count;
 }
 
 // inserts 'value' to the node with the same digits' count
 // otherwise insert new node
 void put_in_order(List *list, int value) {
+	// TODO: implement
 }
 
 // -------------------------------------------------------------
@@ -183,7 +207,7 @@ int main() {
 		case 2:
 			read_list(&list);
 			scanf("%zu", &size);
-			for (int i = 0; i < size; i++) {
+			for (size_t i = 0; i < size; i++) {
 				scanf("%zu", &m);
 				printf("%d ", get_forward(&list, m));
 			}
@@ -192,7 +216,7 @@ int main() {
 		case 3:
 			read_list(&list);
 			scanf("%zu", &size);
-			for (int i = 0; i < size; i++) {
+			for (size_t i = 0; i < size; i++) {
 				scanf("%zu", &m);
 				printf("%d ", get_backward(&list, m));
 			}
@@ -201,7 +225,7 @@ int main() {
 		case 4:
 			read_list(&list);
 			scanf("%zu", &size);
-			for (int i = 0; i < size; i++) {
+			for (size_t i = 0; i < size; i++) {
 				scanf("%zu", &m);
 				remove_at(&list, m);
 			}
@@ -209,7 +233,7 @@ int main() {
 			break;
 		case 5:
 			scanf("%zu", &size);
-			for (int i = 0; i < size; i++) {
+			for (size_t i = 0; i < size; i++) {
 				scanf("%d", &value);
 				put_in_order(&list, value);
 			}
