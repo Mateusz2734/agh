@@ -124,12 +124,26 @@ int get_backward(List *list, size_t n) {
 }
 
 void remove_node(Node *node_ptr) {
-	// TODO: implement
+	node_ptr->next->prev = node_ptr->prev;
+	node_ptr->prev->next = node_ptr->next;
+	free(node_ptr->data);
+	free(node_ptr);
 }
 
 // remove n-th element; if array empty remove node
 void remove_at(List *list, size_t n) {
-	// TODO: implement
+	iterator itr = begin(list->head);
+	skip_forward(&itr, n);
+	if (itr.node_ptr->array_size == 1) {
+		remove_node(itr.node_ptr);
+	} else {
+		int *new_data = (int*)safe_malloc((itr.node_ptr->array_size - 1) * sizeof(int));
+		memcpy(new_data, itr.node_ptr->data, itr.position * sizeof(int));
+		memcpy(new_data + itr.position, itr.node_ptr->data + itr.position + 1, (itr.node_ptr->array_size - itr.position - 1) * sizeof(int));
+		free(itr.node_ptr->data);
+		itr.node_ptr->data = new_data;
+		itr.node_ptr->array_size -= 1;
+	}
 }
 
 // return the number of digits of number n
@@ -211,7 +225,7 @@ void put_in_order(List *list, int value) {
 void dumpList(const List *list) {
 	for(Node *node = list->head->next; node != list->tail; node = node->next) {
 		printf("-> ");
-		for (int k = 0; k < node->array_size; k++) {
+		for (size_t k = 0; k < node->array_size; k++) {
 			printf("%d ", node->data[k]);
 		}
 		printf("\n");
