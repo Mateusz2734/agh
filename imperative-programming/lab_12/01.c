@@ -135,6 +135,7 @@ void remove_at(List *list, size_t n) {
 // return the number of digits of number n
 size_t digits(int n) {
 	size_t count = 0;
+	if (n == 0) return 1;
 	while (n != 0) {
 		n /= 10;
 		count++;
@@ -142,10 +143,65 @@ size_t digits(int n) {
 	return count;
 }
 
+void insert_node(Node *prev_node, Node *new_node) {
+	prev_node->next->prev = new_node;
+	new_node->next = prev_node->next;
+	prev_node->next = new_node;
+	new_node->prev = prev_node;
+}
+
+Node *check_if_node_exists(List *list, int value) {
+	Node *node = list->head->next;
+	while (node != list->tail) {
+		if (digits(node->data[0]) == digits(value)) {
+			return node;
+		}
+		node = node->next;
+	}
+	return NULL;
+}
+
+Node *where_to_insert(List *list, int dig) {
+	Node *node = list->head->next;
+	while (node != list->tail) {
+		if (digits(node->data[0]) > (size_t)dig) {
+			return node->prev;
+		}
+		node = node->next;
+	}
+	return list->tail->prev;
+}
+
+int compare(const void *a, const void *b) {
+	return (*(int*)a - *(int*)b);
+}
+
+void sort_list(List *list) {
+	Node *node = list->head->next;
+	while (node != list->tail) {
+		qsort(node->data, node->array_size, sizeof(int), compare);
+		node = node->next;
+	}
+}
+
 // inserts 'value' to the node with the same digits' count
 // otherwise insert new node
 void put_in_order(List *list, int value) {
-	// TODO: implement
+	Node *node = check_if_node_exists(list, value);
+	if (node == NULL) {
+		node = where_to_insert(list, digits(value));
+		int *data = (int*)safe_malloc(sizeof(int));
+		data[0] = value;
+		Node *new_node = create_node(data, 1, NULL, NULL);
+		insert_node(node, new_node);
+	} else {
+		int *data = (int*)safe_realloc(node->data, (node->array_size + 1) * sizeof(int));
+		data[node->array_size] = value;
+		node->data = data;
+		node->array_size += 1;
+	}
+
+	sort_list(list);
 }
 
 // -------------------------------------------------------------
