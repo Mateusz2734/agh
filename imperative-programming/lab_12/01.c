@@ -49,7 +49,9 @@ void *safe_realloc(void *old_ptr, size_t size) {
 }
 
 Node *create_node(int *data, size_t array_size, Node *next, Node *prev) {
-	Node *node = safe_malloc(sizeof(Node));
+	// TODO: check if it works properly, if not:
+	// Node *node = safe_malloc(sizeof(Node));
+	Node *node = (Node *)safe_malloc(sizeof(Node));
 	node->data = data;
 	node->array_size = array_size;
 	node->next = next;
@@ -69,14 +71,33 @@ void init(List *list) {
 
 // append node to the list
 void push_back(List *list, int *data, size_t array_size) {
+	Node* new_node = create_node(data, array_size, list->tail, list->tail->prev);
+	list->tail->prev = new_node;
+	list->tail->prev->prev->next = new_node;
 }
 
 // set iterator to move n elements forward from its current position
 void skip_forward(iterator* itr, size_t n) {
+	itr->node_ptr = itr->node_ptr->next;
+	n -= 1;
+	while (n > 0) {
+		if (itr->position + n < itr->node_ptr->array_size) {
+			itr->position += n;
+			n = 0;
+		} else {
+			n -= itr->node_ptr->array_size - itr->position;
+			itr->position = 0;
+			itr->node_ptr = itr->node_ptr->next;
+		}
+	}
 }
 
 // forward iteration - get n-th element in the list
 int get_forward(List *list, size_t n) {
+	iterator it = begin(list->head);
+	skip_forward(&it, n);
+	int value = it.node_ptr->data[it.position];
+	return value;
 }
 
 // set iterator to move n elements backward from its current position
