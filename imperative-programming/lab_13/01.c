@@ -38,8 +38,31 @@ typedef struct {
 	DataPFp modify_data;
 } hash_table;
 
-// ---------------------- functions to implement
+typedef struct DataWord {
+	char *word;
+	int counter;
+} DataWord;
 
+// calculate hash function for integer k
+size_t hash_base(int k, size_t size) {
+	static const double c = 0.618033988; // (sqrt(5.) – 1) / 2.;
+	double tmp = k * c;
+	return (size_t)floor((double)size * (tmp - floor(tmp)));
+}
+
+size_t hash_word(data_union data, size_t size) {
+	int s = 0;
+	DataWord *dw = (DataWord*)data.ptr_data;
+	char *p = dw->word;
+	while (*p) {
+		s += *p++;
+	}
+	return hash_base(s, size);
+}
+
+//********************************************
+//*******************TASK 0*******************
+//********************************************
 // initialize table fields
 void init_ht(hash_table *p_table, size_t size, DataFp dump_data, CreateDataFp create_data,
 		 DataFp free_data, CompareDataFp compare_data, HashFp hash_function, DataPFp modify_data) {
@@ -57,24 +80,6 @@ void free_element(DataFp free_data, ht_element *to_delete) {
 void free_table(hash_table* p_table) {
 }
 
-// calculate hash function for integer k
-size_t hash_base(int k, size_t size) {
-	static const double c = 0.618033988; // (sqrt(5.) – 1) / 2.;
-	double tmp = k * c;
-	return (size_t)floor((double)size * (tmp - floor(tmp)));
-}
-
-void rehash(hash_table *p_table) {
-}
-
-// find element; return pointer to previous
-ht_element *find_previous(hash_table *p_table, data_union data) {
-}
-
-// return pointer to element with given value
-ht_element *get_element(hash_table *p_table, data_union *data) {
-}
-
 // insert element
 void insert_element(hash_table *p_table, data_union *data) {
 }
@@ -83,9 +88,20 @@ void insert_element(hash_table *p_table, data_union *data) {
 void remove_element(hash_table *p_table, data_union data) {
 }
 
-// type-specific definitions
+void rehash(hash_table *p_table) {
+}
 
-// int element
+// return pointer to element with given value
+ht_element *get_element(hash_table *p_table, data_union *data) {
+}
+
+// find element; return pointer to previous
+ht_element *find_previous(hash_table *p_table, data_union data) {
+}
+
+//********************************************
+//*******************TASK 1*******************
+//********************************************
 
 size_t hash_int(data_union data, size_t size) {
 	return hash_base(data.int_data, size);
@@ -100,7 +116,9 @@ int cmp_int(data_union a, data_union b) {
 data_union create_int(void* value) {
 }
 
-// char element
+//********************************************
+//*******************TASK 2*******************
+//********************************************
 
 size_t hash_char(data_union data, size_t size) {
 	return hash_base((int)data.char_data, size);
@@ -115,12 +133,9 @@ int cmp_char(data_union a, data_union b) {
 data_union create_char(void* value) {
 }
 
-// Word element
-
-typedef struct DataWord {
-	char *word;
-	int counter;
-} DataWord;
+//********************************************
+//*******************TASK 3*******************
+//********************************************
 
 void dump_word(data_union data) {
 }
@@ -129,16 +144,6 @@ void free_word(data_union data) {
 }
 
 int cmp_word(data_union a, data_union b) {
-}
-
-size_t hash_word(data_union data, size_t size) {
-	int s = 0;
-	DataWord *dw = (DataWord*)data.ptr_data;
-	char *p = dw->word;
-	while (*p) {
-		s += *p++;
-	}
-	return hash_base(s, size);
 }
 
 void modify_word(data_union *data) {
