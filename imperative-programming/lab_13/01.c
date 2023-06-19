@@ -182,21 +182,28 @@ int main(void) {
 
 	scanf ("%d", &to_do);
 	switch (to_do) {
-		case 1: // test integer hash table
+		case 1: {
+			// test integer hash table
 			scanf("%d %zu", &n, &index);
 			init_ht(&table, 4, dump_int, create_int, NULL, cmp_int, hash_int, NULL);
 			test_ht(&table, n);
 			printf ("%zu\n", table.size);
 			dump_list(&table, index);
 			break;
-		case 2: // test char hash table
+		} 
+
+		case 2: {
+			// test char hash table
 			scanf("%d %zu", &n, &index);
 			init_ht(&table, 4, dump_char, create_char, NULL, cmp_char, hash_char, NULL);
 			test_ht(&table, n);
 			printf ("%zu\n", table.size);
 			dump_list(&table, index);
 			break;
-		case 3: // read words from text, insert into hash table, and print
+		} 
+
+		case 3: {
+			// read words from text, insert into hash table, and print
 			scanf("%s", buffer);
 			init_ht(&table, 8, dump_word, create_data_word, free_word, cmp_word, hash_word, modify_word);
 			stream_to_ht(&table, stdin);
@@ -206,9 +213,12 @@ int main(void) {
 			if (e) table.dump_data(e->data);
 			if (table.free_data) table.free_data(data);
 			break;
-		default:
+		} 
+
+		default: {
 			printf("NOTHING TO DO FOR %d\n", to_do);
 			break;
+		}
 	}
 	free_table(&table);
 
