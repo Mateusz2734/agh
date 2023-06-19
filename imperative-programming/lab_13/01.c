@@ -63,6 +63,7 @@ size_t hash_word(data_union data, size_t size) {
 //********************************************
 //*******************TASK 0*******************
 //********************************************
+
 // initialize table fields
 void init_ht(hash_table *p_table, size_t size, DataFp dump_data, CreateDataFp create_data,
 		 DataFp free_data, CompareDataFp compare_data, HashFp hash_function, DataPFp modify_data) {
@@ -108,12 +109,29 @@ size_t hash_int(data_union data, size_t size) {
 }
 
 void dump_int(data_union data) {
+	printf("%d", data.int_data);
 }
 
 int cmp_int(data_union a, data_union b) {
+	if (a.int_data < b.int_data) {
+		return -1;
+	} else if (a.int_data > b.int_data) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 data_union create_int(void* value) {
+	data_union data;
+	
+	data.int_data = *(int*)value;
+	
+	if (value != NULL) {
+		value = &data;
+	}
+
+	return data;
 }
 
 //********************************************
@@ -125,12 +143,30 @@ size_t hash_char(data_union data, size_t size) {
 }
 
 void dump_char(data_union data) {
+	printf("%c", data.char_data);
 }
 
 int cmp_char(data_union a, data_union b) {
+	int cmp = strcmp(&a.char_data, &b.char_data);
+	if (cmp < 0) {
+		return -1;
+	} else if (cmp > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 data_union create_char(void* value) {
+	data_union data;
+	
+	data.char_data = *(char*)value;
+	
+	if (value != NULL) {
+		value = &data;
+	}
+
+	return data;
 }
 
 //********************************************
@@ -138,22 +174,52 @@ data_union create_char(void* value) {
 //********************************************
 
 void dump_word(data_union data) {
+	DataWord *dw = (DataWord*)data.ptr_data;
+	printf("%s", dw->word);
 }
 
 void free_word(data_union data) {
+	DataWord *dw = (DataWord*)data.ptr_data;
+	free(dw->word);
+	free(dw);
 }
 
 int cmp_word(data_union a, data_union b) {
+	DataWord *dw_a = (DataWord*)a.ptr_data;
+	DataWord *dw_b = (DataWord*)b.ptr_data;
+
+	int cmp = strcmp(dw_a->word, dw_b->word);
+	
+	if (cmp < 0) {
+		return -1;
+	} else if (cmp > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 void modify_word(data_union *data) {
+	DataWord *dw = (DataWord*)data->ptr_data;
+
+	dw->counter++;
 }
 
 data_union create_data_word(void *value) {
+	data_union data;
+
+	DataWord *dw = (DataWord*)malloc(sizeof(DataWord));
+	dw->word = (char*)malloc(strlen((char*)value) + 1);
+	strcpy(dw->word, (char*)value);
+	dw->counter = 1;
+	data.ptr_data = dw;
+
+	return data;
 }
 
 // read text, parse it to words, and insert these words to the hashtable
 void stream_to_ht(hash_table *p_table, FILE *stream) {
+	
 }
 
 // test primitive type list
