@@ -50,54 +50,153 @@ size_t hash_base(int k, size_t size) {
 	return (size_t)floor((double)size * (tmp - floor(tmp)));
 }
 
-size_t hash_word(data_union data, size_t size) {
-	int s = 0;
-	DataWord *dw = (DataWord*)data.ptr_data;
-	char *p = dw->word;
-	while (*p) {
-		s += *p++;
-	}
-	return hash_base(s, size);
-}
-
 //********************************************
 //*******************TASK 0*******************
 //********************************************
 
-// initialize table fields
-void init_ht(hash_table *p_table, size_t size, DataFp dump_data, CreateDataFp create_data,
-		 DataFp free_data, CompareDataFp compare_data, HashFp hash_function, DataPFp modify_data) {
-}
-
-// print elements of the list with hash n
-void dump_list(const hash_table* p_table, size_t n) {
-}
-
-// Free element pointed by data_union using free_data() function
-void free_element(DataFp free_data, ht_element *to_delete) {
-}
-
-// free all elements from the table (and the table itself)
-void free_table(hash_table* p_table) {
-}
-
-// insert element
-void insert_element(hash_table *p_table, data_union *data) {
-}
-
-// remove element
-void remove_element(hash_table *p_table, data_union data) {
-}
-
-void rehash(hash_table *p_table) {
-}
-
 // return pointer to element with given value
 ht_element *get_element(hash_table *p_table, data_union *data) {
+	size_t hash = p_table->hash_function(*data, p_table->size);
+	ht_element *elem = &p_table->ht[hash];
+
+	while (elem->next != NULL) {
+		elem = elem->next;
+		if (p_table->compare_data(elem->data, *data) == 0) {
+			return elem;
+		}
+	}
+
+	return NULL;
 }
 
 // find element; return pointer to previous
 ht_element *find_previous(hash_table *p_table, data_union data) {
+	size_t hash = p_table->hash_function(data, p_table->size);
+	ht_element *elem = &p_table->ht[hash];
+
+	while (elem->next != NULL) {
+		if (p_table->compare_data(elem->next->data, data) == 0) {
+			return elem;
+		}
+		elem = elem->next;
+	}
+
+	return NULL;
+}
+
+// initialize table fields
+void init_ht(hash_table *p_table, size_t size, DataFp dump_data, CreateDataFp create_data,
+		DataFp free_data, CompareDataFp compare_data, HashFp hash_function, DataPFp modify_data) {
+	p_table->size = size;
+	p_table->no_elements = 0;
+	p_table->ht = (ht_element*)calloc(size, sizeof(ht_element));
+	p_table->dump_data = dump_data;
+	p_table->create_data = create_data;
+	p_table->free_data = free_data;
+	p_table->compare_data = compare_data;
+	p_table->hash_function = hash_function;
+	p_table->modify_data = modify_data;
+
+	for (size_t i = 0; i < size; i++) {
+		p_table->ht[i].next = NULL;
+	}
+}
+
+// print elements of the list with hash n
+void dump_list(const hash_table* p_table, size_t n) {
+	ht_element elem = p_table->ht[n];
+
+	if (elem.next == NULL) {
+		return;
+	} else {
+		elem = *elem.next;
+	}
+	
+	while (elem.next != NULL) {
+		p_table->dump_data(elem.data);
+		elem = *elem.next;
+	}
+
+	p_table->dump_data(elem.data);
+}
+
+// Free element pointed by data_union using free_data() function
+void free_element(DataFp free_data, ht_element *to_delete) {
+	free_data(to_delete->data);
+}
+
+// free all elements from the table (and the table itself)
+void free_table(hash_table* p_table) {
+	for (size_t i = 0; i < p_table->size; i++) {
+		ht_element *elem = &p_table->ht[i];
+		
+		if (elem->next == NULL) {
+			continue;
+		}
+
+		while (elem->next->next != NULL) {
+			ht_element *to_delete = elem->next;
+			elem->next = to_delete->next;
+			free_element(p_table->free_data, to_delete);
+		}
+
+		free_element(p_table->free_data, elem->next);
+	}
+
+	free(p_table->ht);
+}
+
+void rehash(hash_table *p_table) {
+	//TODO
+}
+
+// insert element
+void insert_element(hash_table *p_table, data_union *data) {
+	ht_element *elem = get_element(p_table, data);
+
+	if (elem != NULL && p_table->modify_data != NULL) {
+		p_table->modify_data(&elem->data);
+		return;
+	} else if (p_table->modify_data == NULL) {
+		return;
+	}
+	
+	size_t hash = p_table->hash_function(*data, p_table->size);
+
+	ht_element to_insert = {NULL, *data};
+	ht_element *iter = &p_table->ht[hash];
+
+	while (iter->next != NULL) {
+		iter = iter->next;
+	}
+
+	iter->next = &to_insert;
+
+	p_table->no_elements++;
+
+	if (p_table->no_elements > 4 * p_table->size) {
+		rehash(p_table);
+	}
+}
+
+// remove element
+void remove_element(hash_table *p_table, data_union data) {
+	ht_element *to_delete = get_element(p_table, &data);
+	ht_element *prev = find_previous(p_table, data);
+
+	if (to_delete == NULL) {
+		return;
+	}
+
+	if (prev == NULL) {
+		p_table->ht[p_table->hash_function(data, p_table->size)].next = to_delete->next;
+	} else {
+		prev->next = to_delete->next;
+	}
+
+	free_element(p_table->free_data, to_delete);
+
+	p_table->no_elements--;
 }
 
 //********************************************
@@ -173,6 +272,17 @@ data_union create_char(void* value) {
 //*******************TASK 3*******************
 //********************************************
 
+size_t hash_word(data_union data, size_t size) {
+	int s = 0;
+	DataWord *dw = (DataWord*)data.ptr_data;
+	char *p = dw->word;
+	while (*p) {
+		s += *p++;
+	}
+	return hash_base(s, size);
+}
+
+
 void dump_word(data_union data) {
 	DataWord *dw = (DataWord*)data.ptr_data;
 	printf("%s", dw->word);
@@ -219,7 +329,7 @@ data_union create_data_word(void *value) {
 
 // read text, parse it to words, and insert these words to the hashtable
 void stream_to_ht(hash_table *p_table, FILE *stream) {
-	
+	// TODO
 }
 
 // test primitive type list
@@ -261,7 +371,7 @@ int main(void) {
 			printf ("%zu\n", table.size);
 			dump_list(&table, index);
 			break;
-		} 
+		}
 
 		case 2: {
 			// test char hash table
@@ -295,4 +405,3 @@ int main(void) {
 
 	return 0;
 }
-
