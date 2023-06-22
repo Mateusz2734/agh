@@ -312,7 +312,7 @@ size_t hash_word(data_union data, size_t size) {
 
 void dump_word(data_union data) {
 	DataWord *dw = (DataWord*)data.ptr_data;
-	printf("%s", dw->word);
+	printf("%s %d", dw->word, dw->counter);
 }
 
 void free_word(data_union data) {
@@ -325,15 +325,7 @@ int cmp_word(data_union a, data_union b) {
 	DataWord *dw_a = (DataWord*)a.ptr_data;
 	DataWord *dw_b = (DataWord*)b.ptr_data;
 
-	int cmp = strcmp(dw_a->word, dw_b->word);
-	
-	if (cmp < 0) {
-		return -1;
-	} else if (cmp > 0) {
-		return 1;
-	} else {
-		return 0;
-	}
+	return strcmp(dw_a->word, dw_b->word);
 }
 
 void modify_word(data_union *data) {
@@ -342,11 +334,20 @@ void modify_word(data_union *data) {
 	dw->counter++;
 }
 
+void toLowerCase(char* str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        str[i] = tolower(str[i]);
+        i++;
+    }
+}
+
 data_union create_data_word(void *value) {
 	data_union data;
 
 	DataWord *dw = (DataWord*)malloc(sizeof(DataWord));
 	dw->word = (char*)malloc(strlen((char*)value) + 1);
+	toLowerCase((char*)value);
 	strcpy(dw->word, (char*)value);
 	dw->counter = 1;
 	data.ptr_data = dw;
@@ -356,7 +357,29 @@ data_union create_data_word(void *value) {
 
 // read text, parse it to words, and insert these words to the hashtable
 void stream_to_ht(hash_table *p_table, FILE *stream) {
-	// TODO
+	const char delimiters[] = " \n\t.,?!:;-";
+
+	char* str = (char*)malloc(BUFFER_SIZE * sizeof(char));
+    if (str == NULL) {
+        printf("Memory allocation failed.\n");
+        fclose(stream);
+    }
+
+    char buffer[BUFFER_SIZE];
+    str[0] = '\0';
+
+    while (fgets(buffer, BUFFER_SIZE, stream) != NULL) {
+        strcat(str, buffer);
+    }
+
+	char* token = strtok(str, delimiters);
+    while (token != NULL) {
+		data_union data = create_data_word(token);
+		insert_element(p_table, &data);
+		token = strtok(NULL, delimiters);
+	}
+
+    free(str);
 }
 
 // test primitive type list
