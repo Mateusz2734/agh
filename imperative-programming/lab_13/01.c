@@ -59,11 +59,21 @@ ht_element *get_element(hash_table *p_table, data_union *data) {
 	size_t hash = p_table->hash_function(*data, p_table->size);
 	ht_element *elem = &p_table->ht[hash];
 
+	if (elem->next == NULL) {
+		return NULL;
+	}
+
+	elem = elem->next;
+
 	while (elem->next != NULL) {
-		elem = elem->next;
 		if (p_table->compare_data(elem->data, *data) == 0) {
 			return elem;
 		}
+		elem = elem->next;
+	}
+
+	if (p_table->compare_data(elem->data, *data) == 0) {
+			return elem;
 	}
 
 	return NULL;
@@ -89,7 +99,7 @@ void init_ht(hash_table *p_table, size_t size, DataFp dump_data, CreateDataFp cr
 		DataFp free_data, CompareDataFp compare_data, HashFp hash_function, DataPFp modify_data) {
 	p_table->size = size;
 	p_table->no_elements = 0;
-	p_table->ht = (ht_element*)calloc(size, sizeof(ht_element));
+	p_table->ht = (ht_element*)malloc(size * sizeof(ht_element));
 	p_table->dump_data = dump_data;
 	p_table->create_data = create_data;
 	p_table->free_data = free_data;
@@ -108,13 +118,15 @@ void dump_list(const hash_table* p_table, size_t n) {
 
 	if (elem.next == NULL) {
 		return;
-	} else {
-		elem = *elem.next;
+	} 
+	else {
+		elem = *(elem.next);
 	}
 	
 	while (elem.next != NULL) {
 		p_table->dump_data(elem.data);
-		elem = *elem.next;
+
+		elem = *(elem.next);
 	}
 
 	p_table->dump_data(elem.data);
@@ -122,7 +134,8 @@ void dump_list(const hash_table* p_table, size_t n) {
 
 // Free element pointed by data_union using free_data() function
 void free_element(DataFp free_data, ht_element *to_delete) {
-	free_data(to_delete->data);
+	if (free_data != NULL) free_data(to_delete->data);
+	free(to_delete);
 }
 
 // free all elements from the table (and the table itself)
@@ -147,7 +160,32 @@ void free_table(hash_table* p_table) {
 }
 
 void rehash(hash_table *p_table) {
-	//TODO
+	ht_element *new_ht = (ht_element*)malloc(2 * p_table->size * sizeof(ht_element));
+	for (size_t i = 0; i < 2 * p_table->size; i++) {
+		new_ht[i].next = NULL;
+	}
+	
+	for (size_t i = 0; i < p_table->size; i++) {
+		ht_element *elem = &p_table->ht[i];
+
+		if (elem->next == NULL) {
+			continue;
+		}
+
+		while (elem->next != NULL) {
+			ht_element *to_move = elem->next;
+			elem->next = to_move->next;
+			size_t hash = p_table->hash_function(to_move->data, 2 * p_table->size);
+			ht_element *iter = &new_ht[hash];
+
+			to_move->next = iter->next;
+			iter->next = to_move;
+		}
+	}
+	
+	free_table(p_table);
+	p_table->size *= 2;
+	p_table->ht = new_ht;
 }
 
 // insert element
@@ -157,20 +195,18 @@ void insert_element(hash_table *p_table, data_union *data) {
 	if (elem != NULL && p_table->modify_data != NULL) {
 		p_table->modify_data(&elem->data);
 		return;
-	} else if (p_table->modify_data == NULL) {
+	} else if (elem != NULL && p_table->modify_data == NULL) {
 		return;
 	}
 	
 	size_t hash = p_table->hash_function(*data, p_table->size);
-
-	ht_element to_insert = {NULL, *data};
+	ht_element *to_insert = (ht_element*)malloc(sizeof(ht_element));
+	to_insert->data = *data;
+	to_insert->next = NULL;
 	ht_element *iter = &p_table->ht[hash];
 
-	while (iter->next != NULL) {
-		iter = iter->next;
-	}
-
-	iter->next = &to_insert;
+	to_insert->next = iter->next;
+	iter->next = to_insert;
 
 	p_table->no_elements++;
 
@@ -208,26 +244,24 @@ size_t hash_int(data_union data, size_t size) {
 }
 
 void dump_int(data_union data) {
-	printf("%d", data.int_data);
+	printf("%d ", data.int_data);
 }
 
 int cmp_int(data_union a, data_union b) {
-	if (a.int_data < b.int_data) {
-		return -1;
-	} else if (a.int_data > b.int_data) {
-		return 1;
-	} else {
+	if (a.int_data == b.int_data) {
 		return 0;
-	}
+	} 
+
+	return 1;
 }
 
 data_union create_int(void* value) {
 	data_union data;
 	
-	data.int_data = *(int*)value;
-	
+	scanf("%d", &data.int_data);
+
 	if (value != NULL) {
-		value = &data;
+		*(data_union*)value = data;
 	}
 
 	return data;
@@ -242,27 +276,20 @@ size_t hash_char(data_union data, size_t size) {
 }
 
 void dump_char(data_union data) {
-	printf("%c", data.char_data);
+	printf("%c ", data.char_data);
 }
 
 int cmp_char(data_union a, data_union b) {
-	int cmp = strcmp(&a.char_data, &b.char_data);
-	if (cmp < 0) {
-		return -1;
-	} else if (cmp > 0) {
-		return 1;
-	} else {
-		return 0;
-	}
+	return strcmp(&a.char_data, &b.char_data);
 }
 
 data_union create_char(void* value) {
 	data_union data;
-	
-	data.char_data = *(char*)value;
+
+	scanf(" %c", &data.char_data);
 	
 	if (value != NULL) {
-		value = &data;
+		*(data_union*)value = data;
 	}
 
 	return data;
@@ -338,8 +365,8 @@ void test_ht(hash_table *p_table, int n) {
 	data_union data;
 	for (int i = 0; i < n; ++i) {
 		scanf(" %c", &op);
-//		p_table->create_data(&data);
-		data = p_table->create_data(NULL); // should give the same result as the line above
+		p_table->create_data(&data);
+		// data = p_table->create_data(NULL); // should give the same result as the line above
 		switch (op) {
 			case 'r':
 				remove_element(p_table, data);
