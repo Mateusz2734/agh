@@ -22,3 +22,11 @@
     - 01.c: 75%
 - Lab 09:
     - 01.c: 0% (not started)
+- Lab 10:
+    - 01.c: 0% (not started)
+- Lab 11:
+    - 01.c: 0% (not started)
+- Lab 12:
+    - 01.c: 100%
+- Lab 13:
+    - 01.c: 100%
