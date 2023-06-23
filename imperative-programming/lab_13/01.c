@@ -334,7 +334,7 @@ void modify_word(data_union *data) {
 	dw->counter++;
 }
 
-void toLowerCase(char* str) {
+void to_lower_case(char* str) {
     int i = 0;
     while (str[i] != '\0') {
         str[i] = tolower(str[i]);
@@ -347,8 +347,10 @@ data_union create_data_word(void *value) {
 
 	DataWord *dw = (DataWord*)malloc(sizeof(DataWord));
 	dw->word = (char*)malloc(strlen((char*)value) + 1);
-	toLowerCase((char*)value);
+
+	to_lower_case((char*)value);
 	strcpy(dw->word, (char*)value);
+
 	dw->counter = 1;
 	data.ptr_data = dw;
 
@@ -360,10 +362,6 @@ void stream_to_ht(hash_table *p_table, FILE *stream) {
 	const char delimiters[] = " \n\t.,?!:;-";
 
 	char* str = (char*)malloc(BUFFER_SIZE * sizeof(char));
-    if (str == NULL) {
-        printf("Memory allocation failed.\n");
-        fclose(stream);
-    }
 
     char buffer[BUFFER_SIZE];
     str[0] = '\0';
@@ -373,8 +371,10 @@ void stream_to_ht(hash_table *p_table, FILE *stream) {
     }
 
 	char* token = strtok(str, delimiters);
+
     while (token != NULL) {
 		data_union data = create_data_word(token);
+
 		insert_element(p_table, &data);
 		token = strtok(NULL, delimiters);
 	}
