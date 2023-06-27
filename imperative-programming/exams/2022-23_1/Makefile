@@ -1,6 +1,6 @@
 .PHONY: run1 run2 run3
 
-# -
+# Really useful flag: -fanalyzer
 
 run1:
 	@gcc 01.c -o 01.exe -lm -Wpedantic -Wall -Wextra
