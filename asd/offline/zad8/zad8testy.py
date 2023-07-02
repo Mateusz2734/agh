@@ -11,9 +11,10 @@ def copyarg( arg ):
 
 def printarg(*arg):
     print(f'rozmiar mapy  : {len(arg[0][0])} x {len(arg[0])}')
-#    print(f'mapa          :')
-#    for l in arg[0]:
-#      print(l)
+    print(f'mapa          :')
+    for l in arg[0]:
+        if len(l) < 40:
+            print(l)
 
 
 def printhint( hint ):
