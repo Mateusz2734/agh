@@ -36,11 +36,9 @@ def dijkstra(G, s):
 
 
 def change_graph(n, G, r):
-    L = [[None for _ in range(len(G[i]))] for i in range(n)]
     for i in range(n):
         for j in range(len(G[i])):
-            L[i][j] = (G[i][j][0], r + G[i][j][1] * 2)
-    return L
+            G[i][j] = (G[i][j][0], r + G[i][j][1] * 2)
 
 
 # G - graf
@@ -51,15 +49,18 @@ def change_graph(n, G, r):
 def gold(G, V, s, t, r):
     n = len(V)
 
-    smallest_cost = dijkstra(G, s)[t]
+    normal = dijkstra(G, s)
 
-    L = change_graph(n, G, r)
+    change_graph(n, G, r)
 
+    changed = dijkstra(G, t)
+
+    min_cost = inf
     for i in range(n):
-        curr_cost = dijkstra(G, s)[i] - V[i] + dijkstra(L, i)[t]
-        if curr_cost < smallest_cost:
-            smallest_cost = curr_cost
-    return smallest_cost
+        cost = normal[i] + changed[i] - V[i]
+        if cost < min_cost:
+            min_cost = cost
+    return min_cost
 
 
 # zmien all_tests na True zeby uruchomic wszystkie testy
