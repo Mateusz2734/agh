@@ -28,13 +28,12 @@ def dijkstra(G, s):
 
 
 def prepare_data(E, S, n):
-    G = [[] for _ in range(n)]
+    # wierzchołek n+1 to "osobliwość"
+    G = [[] for _ in range(n + 1)]
 
     for i in S:
-        for j in S:
-            if i < j:
-                G[i].append((j, 0))
-                G[j].append((i, 0))
+        G[n].append((i, 0))
+        G[i].append((n, 0))
 
     for u, v, l in E:
         G[u].append((v, l))
@@ -45,7 +44,9 @@ def prepare_data(E, S, n):
 
 def spacetravel(n, E, S, a, b):
     G = prepare_data(E, S, n)
+
     d = dijkstra(G, a)
+
     return d[b] if d[b] != inf else None
 
 
