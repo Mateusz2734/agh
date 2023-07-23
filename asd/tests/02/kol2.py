@@ -2,6 +2,7 @@ from kol2testy import runtests
 from collections import deque
 from math import inf
 
+
 def bfs(G, s):
     n = len(G)
     visited = [False for _ in range(n)]
@@ -20,6 +21,7 @@ def bfs(G, s):
                 Q.append(v)
     return False not in visited
 
+
 def get_edges(G):
     n = len(G)
     E = []
@@ -28,6 +30,7 @@ def get_edges(G):
             if elem[0] > i:
                 E.append((i, elem[0], elem[1]))
     return E
+
 
 def build_graph(E, n, i):
     G = [[] for _ in range(n)]
@@ -38,6 +41,7 @@ def build_graph(E, n, i):
         G[elem[0]].append(elem[1])
         G[elem[1]].append(elem[0])
     return G, row_sum
+
 
 def beautree(G):
     n = len(G)
@@ -54,5 +58,6 @@ def beautree(G):
                 min_sum = weight_sum
     return min_sum
 
+
 # zmien all_tests na True zeby uruchomic wszystkie testy
-runtests( beautree, all_tests = True )
+runtests(beautree, all_tests=True)
