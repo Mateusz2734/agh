@@ -35,3 +35,18 @@ def BFS(G, s):
                 Q.append(i)
                 visited[i] = True
     return visited
+
+# -----DFS WITH ADJACENCY LIST-----
+def DFS(G, s):
+    visited = [False for _ in range(len(G))]
+    result = [s]
+
+    def dfs_visit(u, G, visited, result):
+        visited[u] = True 
+        for v in G[u]:
+            if not visited[v]:
+                result.append(v)
+                dfs_visit(v, G, visited, result)
+
+    dfs_visit(s, G, visited, result)
+    return result
