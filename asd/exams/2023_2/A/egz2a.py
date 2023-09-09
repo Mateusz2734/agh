@@ -7,6 +7,9 @@
 # Czasowa O(n), ponieważ korzystam jedynie z dwóch liniowych pętli
 # Pamięciowa O(1), ponieważ nie zapamiętuję żadnych tablic
 
+# UWAGA!
+# NIEPOPRAWNA HEURYSTYKA, KONTRPRZYKŁAD: [(1,1), (2,1), (3,1), (1,2), (2,2), (3,2), (4,3), (8,2)]
+
 from egz2atesty import runtests
 
 
