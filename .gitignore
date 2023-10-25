@@ -13,3 +13,6 @@ __pycache__
 
 # VSCode config
 .vscode
+
+*.hi
+*.o
