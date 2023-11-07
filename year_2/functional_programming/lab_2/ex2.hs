@@ -9,3 +9,4 @@ subtrNFrom5 = (5 -) -- subtrNFrom5 3 = 2
 
 subtr5From_ :: (Num a) => a -> a
 subtr5From_ x = x - 5 -- subtr5From_ 6 = 1
+-- OR: subtr5From_ = flip (-) 5
