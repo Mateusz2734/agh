@@ -12,3 +12,7 @@ displEqs = (\t -> 4 * t ^ 2 + 2 * t, \t -> 3 * t ^ 2)
 
 sortDesc :: Ord a => [a] -> [a]
 sortDesc xs = (reverse . sort) xs
+
+are2FunsEqAt :: Eq a => (t -> a) -> (t -> a) -> [t] -> Bool
+are2FunsEqAt _ _ [] = True
+are2FunsEqAt f g (x:xs) = f x == g x && are2FunsEqAt f g xs  
