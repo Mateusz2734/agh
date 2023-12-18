@@ -1,3 +1,4 @@
+import Control.Monad.RWS.Lazy (MonadState(put))
 actSeq = putChar 'A' >> putChar 'G' >> putChar 'H' >> putChar '\n'
 
 doActSeq = do
@@ -39,11 +40,16 @@ dialog =
                 then putStrLn "Odd number! That's most people's choice..."
                 else putStrLn "Hm, even number? Unusual!"
 
--- TODO
 doDialog = do
   putStr "What is your happy number? "
   line <- getLine
-  putStr line
+  let num = read line :: Int
+  if num == 7
+    then putStrLn "Ah, lucky 7!"
+    else
+      if odd num
+        then putStrLn "Odd number! That's most people's choice..."
+        else putStrLn "Hm, even number? Unusual!"
 
 doTwoQuestions :: IO ()
 doTwoQuestions = do
@@ -53,6 +59,9 @@ doTwoQuestions = do
   age <- getLine
   print (name, age)
 
--- TODO
 twoQuestions :: IO ()
-twoQuestions = putStrLn "What is your name? "
+twoQuestions = putStrLn "What is your name? " >>
+  getLine >>= \name ->
+  putStrLn "How old are you? " >>
+  getLine >>= \age ->
+  print (name, age)
