@@ -37,10 +37,17 @@ with open("output.txt", "w") as f:
     f.write("\n")
 
 words = []
+multisim = []
 for _, row in df.iterrows():
     words.append(f"{row['CURR_BIN']}{row['INPUTS (G12)']}{row['NEXT_BIN']}")
+    multisim.append(f"{row['CURR_BIN'][::-1]} {row['INPUTS (G12)'][::-1]} {row['NEXT_BIN'][::-1]}")
 
 with open("word_generator.txt", "w") as f:
     f.write("CURRENT_STATE(4)|INPUTS(3)|NEXT_STATE(4)\n")
     f.write("\n".join(words))
+    f.write("\n")
+
+    f.write("\n")
+    f.write("\n")
+    f.write("\n".join([hex(int(word, 2))[2:] for word in words]))
     f.write("\n")
