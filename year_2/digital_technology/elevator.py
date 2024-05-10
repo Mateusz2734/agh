@@ -1,8 +1,8 @@
 from tabulate import tabulate
 import pandas as pd
 
-states = ["GO", "GC", "1O", "1C", "2O", "2C"]
-states_bin = {"GO": "1100", "GC": "0100", "1O": "1010", "1C": "0010", "2O": "1001", "2C": "0001"}
+states = ["GO", "GC", "1O", "1C", "2O", "2C", "INIT"]
+states_bin = {"GO": "1100", "GC": "0100", "1O": "1010", "1C": "0010", "2O": "1001", "2C": "0001", "INIT": "0000"}
 
 df = pd.read_csv("data.csv")
 df["CURR_BIN"] = df["CURR"].map(states_bin)
@@ -13,7 +13,6 @@ df=df[["CURR", "CURR_BIN", "INPUTS (G12)", "NEXT", "NEXT_BIN"]]
 
 print(tabulate(df, headers="keys", tablefmt="grid", showindex=False, colalign=("center", "center", "center", "center", "center")))
 
-k=0
 lines = []
 for k in range(4):
     zeros = []
