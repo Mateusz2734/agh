@@ -35,3 +35,12 @@ with open("output.txt", "w") as f:
         f.write(f"DCs: {line[2]}\n")
         f.write("\n")
     f.write("\n")
+
+words = []
+for _, row in df.iterrows():
+    words.append(f"{row['CURR_BIN']}{row['INPUTS (G12)']}{row['NEXT_BIN']}")
+
+with open("word_generator.txt", "w") as f:
+    f.write("CURRENT_STATE(4)|INPUTS(3)|NEXT_STATE(4)\n")
+    f.write("\n".join(words))
+    f.write("\n")
