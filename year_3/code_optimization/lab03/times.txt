@@ -1,0 +1,48 @@
+2.1:
+Without -O2:
+Time: 3.482041e+01
+With -O2:
+Time: 1.198669e+01
+
+2.2:
+Without -O2:
+Time: 2.262018e+01
+With -O2:
+Time: 1.175361e+01
+
+2.3:
+Without -O2:
+Time: 1.656673e+01
+With -O2:
+Time: 7.471237e+00
+
+2.4:
+Without -O2:
+Time: 1.850940e+01
+With -O2:
+Time: 6.659474e+00
+
+2.5:
+Without -O2:
+Time: 1.785768e+01
+With -O2:
+Time: 6.208945e+00
+
+2.6:
+Without -O2:
+Time: 1.264373e+01
+With -O2:
+Time: 5.051389e+00
+
+2.7:
+gcc -lm -O2 -mavx chol6.c
+Time: 4.960314e+00
+
+gcc -lm -O2 -mavx -march=native chol6.c
+Time: 5.136647e+00
+
+gcc -lm -O2 -mavx -mfma chol6.c
+Time: 4.702723e+00
+
+gcc -lm -O2 -mavx -march=native -mfma chol6.c
+Time: 5.120817e+00
