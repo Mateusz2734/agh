@@ -1,0 +1,76 @@
+2.1
+Without -O2:
+Time: 95.8204
+
+With -O2:
+Time: 39.4962
+
+2.2
+Without -O2:
+Time: 10.2022
+
+With -O2:
+Time: 1.09489
+
+2.3
+Without -O2:
+Time: 10.2312
+
+With -O2:
+Time: 1.06261
+
+2.4
+Without -O2:
+Time: 10.9727
+
+With -O2:
+Time: 0.952232
+
+2.5
+Without -O2:
+Time: 9.31881
+
+With -O2:
+Time: 0.932509
+
+2.6
+Without -O2:
+Time: 9.69851
+
+With -O2:
+Time: 0.923708
+
+2.7
+Without -O2:
+Time: 0.71699
+
+With -O2:
+Time: 0.257657
+
+2.8
+Without -O2:
+Time: 13.3524
+
+With -O2:
+Time: 3.96766
+
+2.9
+Without -O2:
+Time: 3.83293
+
+With -O2:
+Time: 0.36895
+
+2.10
+Without -O2:
+Time: 4.27322
+
+With -O2:
+Time: 0.328993
+
+2.11
+Without -O2:
+Time: 0.880776
+
+With -O2:
+Time: 0.257401
