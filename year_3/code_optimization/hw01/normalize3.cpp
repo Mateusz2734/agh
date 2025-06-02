@@ -1,16 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <time.h>
-#include <string>
 #include <iostream>
 #include <sstream>
-#include <cctype>
-#include <vector>
 
 static double gtod_ref_time_sec = 0.0;
 
-std::string normalizeText(std::string input) {
+std::string normalizeText(const std::string & input) {
   std::string processed;
   processed.reserve(input.length());
 
@@ -21,32 +15,14 @@ std::string normalizeText(std::string input) {
         processed += ' ';
         lastWasSpace = true;
       }
-    }
-    else {
-      processed += ch;
+    } else if (ch >= 32 && ch <= 126) {
+      processed += std::ispunct(static_cast<unsigned char>(ch)) ? ',' : std::tolower(static_cast<unsigned char>(ch));
       lastWasSpace = false;
     }
   }
 
-  std::string cleaned;
-  cleaned.reserve(processed.length());
-  for (char ch : processed) {
-    if (ch >= 32 && ch <= 126) {
-      cleaned += ch;
-    }
-  }
 
-  for (char &ch : cleaned) {
-    ch = std::tolower(static_cast<unsigned char>(ch));
-  }
-
-  for (char &ch : cleaned) {
-    if (std::ispunct(static_cast<unsigned char>(ch))) {
-      ch = ',';
-    }
-  }
-
-  std::istringstream iss(cleaned);
+  std::istringstream iss(processed);
   std::ostringstream oss;
   std::string word, lastWord;
   bool first = true;
@@ -97,8 +73,8 @@ int main(int argc, const char *argv[]) {
   }
   dtime = dclock() - dtime;
 
-  std::cout << "Time: " << dtime << "\n";
-  std::cout << "Result: " << result << "\n";
+  std::cout << dtime << "\n";
+  // std::cout << "Result: " << result << "\n";
   fflush(stdout);
 
   return 0;

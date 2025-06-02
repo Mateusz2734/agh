@@ -1,47 +1,34 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <time.h>
-#include <string>
 #include <iostream>
 #include <sstream>
-#include <cctype>
-#include <vector>
+#include <iterator>
+#include <algorithm>
 
 static double gtod_ref_time_sec = 0.0;
 
-std::string normalizeText(const std::string & input) {
+std::string normalizeText(const std::string& input) {
   std::string processed;
-  processed.reserve(input.length());
+  processed.resize(input.size());
+  
+  std::transform(input.begin(), input.end(), processed.begin(), [](unsigned char ch) -> char {
+      if (std::isspace(ch)) return ' ';
+      if (ch >= 32 && ch <= 126) return std::ispunct(ch) ? ',' : static_cast<char>(std::tolower(ch));
+      return ch;
+  });
+  
+  std::string output;
+  output.reserve(processed.size());
+  std::unique_copy(processed.begin(), processed.end(),
+                    std::back_inserter(output),
+                    [](char a, char b) { return a == ' ' && b == ' '; });
 
-  bool lastWasSpace = false;
-  for (char ch : input) {
-    if (std::isspace(static_cast<unsigned char>(ch))) {
-      if (!lastWasSpace) {
-        processed += ' ';
-        lastWasSpace = true;
-      }
-    } else if (ch >= 32 && ch <= 126) {
-      processed += std::ispunct(static_cast<unsigned char>(ch)) ? ',' : std::tolower(static_cast<unsigned char>(ch));
-      lastWasSpace = false;
-    }
-  }
-
-
-  std::istringstream iss(processed);
+  std::istringstream iss(output);
   std::ostringstream oss;
-  std::string word, lastWord;
-  bool first = true;
-  while (iss >> word) {
-    if (word != lastWord) {
-      if (!first) {
-        oss << " ";
-      }
-      oss << word;
-      lastWord = word;
-      first = false;
-    }
-  }
+  std::unique_copy(
+      std::istream_iterator<std::string>(iss),
+      std::istream_iterator<std::string>(),
+      std::ostream_iterator<std::string>(oss, " ")
+  );
 
   return oss.str();
 }
@@ -79,8 +66,8 @@ int main(int argc, const char *argv[]) {
   }
   dtime = dclock() - dtime;
 
-  std::cout << "Time: " << dtime << "\n";
-  std::cout << "Result: " << result << "\n";
+  std::cout << dtime << "\n";
+  // std::cout << "Result: " << result << "\n";
   fflush(stdout);
 
   return 0;

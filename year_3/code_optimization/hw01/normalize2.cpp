@@ -1,17 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <time.h>
-#include <string>
 #include <iostream>
 #include <sstream>
-#include <cctype>
-#include <vector>
 
 static double gtod_ref_time_sec = 0.0;
 
 std::string normalizeText(std::string input) {
   std::string processed;
+  processed.reserve(input.length());
+
   bool lastWasSpace = false;
   for (char ch : input) {
     if (std::isspace(static_cast<unsigned char>(ch))) {
@@ -27,6 +23,7 @@ std::string normalizeText(std::string input) {
   }
 
   std::string cleaned;
+  cleaned.reserve(processed.length());
   for (char ch : processed) {
     if (ch >= 32 && ch <= 126) {
       cleaned += ch;
@@ -94,7 +91,8 @@ int main(int argc, const char *argv[]) {
   }
   dtime = dclock() - dtime;
 
-  std::cout << "Time: " << dtime << "\n";
+  std::cout << dtime << "\n";
+  // std::cout << "Result: " << result << "\n";
   fflush(stdout);
 
   return 0;

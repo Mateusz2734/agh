@@ -1,12 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <time.h>
-#include <string>
 #include <iostream>
 #include <sstream>
-#include <cctype>
-#include <vector>
 
 static double gtod_ref_time_sec = 0.0;
 
@@ -94,7 +88,8 @@ int main(int argc, const char *argv[]) {
   }
   dtime = dclock() - dtime;
 
-  std::cout << "Time: " << dtime << "\n";
+  std::cout << dtime << "\n";
+  // std::cout << "Result: " << result << "\n";
   fflush(stdout);
 
   return 0;
