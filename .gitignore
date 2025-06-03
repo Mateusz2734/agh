@@ -16,6 +16,7 @@ __pycache__
 
 *.hi
 *.o
+*.out
 *target/
 *.lock
 *bin

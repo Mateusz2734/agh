@@ -371,7 +371,7 @@ class Profile(Object):
 
     def getFunctionId(self, funcName):
         for f in self.functions:
-            if self.functions[f].name.startswith(funcName):
+            if funcName in self.functions[f].name:
                 return f
         return False
     
